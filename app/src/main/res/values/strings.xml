@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Expenses</string>
+    <string name="tableName">expenses</string>
+    <string name="Grocery">Grocery</string>
+    <string name="Fuel">Fuel</string>
+    <string name="Cafes">Cafes</string>
+    <string name="Entertainment">Entertainment</string>
+    <string name="Public_transport">Public transport</string>
+    <string name="Communications">Communications</string>
+    <string name="Utilities">Utilities</string>
+    <string name="Kids_education_development">Kids education</string>
+    <string name="Alcohol">Alcohol</string>
+    <string name="Car_maintenance">Car maintenance</string>
+    <string name="House_maintenance">House maintenance</string>
+    <string name="Insurances">Insurances</string>
+    <string name="Medical">Medical</string>
+    <string name="Hygiene">Hygiene</string>
+    <string name="Detergents">Detergents</string>
+    <string name="Clothes">Clothes</string>
+    <string name="Presents">Presents</string>
+    <string name="Income">Income</string>
+    <string name="Input_amount">Enter expense amount</string>
+    <string name="today">Today</string>
+    <string name="submit">Submit</string>
+    <string name="add_new_category">Add new category</string>
+
+
+</resources>
