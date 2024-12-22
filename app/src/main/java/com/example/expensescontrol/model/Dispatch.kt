@@ -52,6 +52,7 @@ class Dispatch: ViewModel() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun getPreviousExpenses(): MutableList<com.example.expensescontrol.Record>{
+//        val date = Date(dateString = 2024-12-22 T 10:18:15.311Z)
         var date = Date(2024, 12,  17)
         val rec: com.example.expensescontrol.Record = com.example.expensescontrol.Record(
             rowId = 1,

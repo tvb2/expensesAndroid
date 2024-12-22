@@ -94,7 +94,6 @@ fun MainScreen(
 
                 PreviousExpenses(
                     modifier
-
                 )
                 AppBottomBar(
                     modifier

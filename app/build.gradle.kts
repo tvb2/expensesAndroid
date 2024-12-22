@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.media3.common.ktx)
     val sqlite_version = "2.4.0"
     val lifecycle_version = "2.5.1"
     implementation(libs.androidx.core.ktx)
