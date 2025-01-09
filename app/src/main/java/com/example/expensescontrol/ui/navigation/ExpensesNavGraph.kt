@@ -48,12 +48,12 @@ fun ExpensesNavHost(
     ) {
         composable(route = MainScreenDestination.route) {
             MainScreen(
-                navigateToSettings = {navController.navigate(SettingsDestination)  }
+                navigateToSettings = {navController.navigate(SettingsDestination.route)  }
             )
         }
         composable(route = SettingsDestination.route) {
             SettingsScreen(
-                navigateToMainScreen = { navController.navigate(MainScreenDestination) }
+                navigateToMainScreen = { navController.navigate(MainScreenDestination.route) }
             )
         }
 

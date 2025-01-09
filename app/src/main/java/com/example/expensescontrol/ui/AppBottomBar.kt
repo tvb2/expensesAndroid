@@ -13,11 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.expensescontrol.R
 import com.example.expensescontrol.ui.home.MainScreenDestination
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppBottomBar(
+    config: String = "main",
     navigateFirstButton: () -> Unit,
     title: String,
     canNavigateBack: Boolean,
@@ -37,7 +39,11 @@ fun AppBottomBar(
                 onClick = navigateFirstButton
             ) {
                 Text(
-                    text = "Settings"
+                    text = when(config){
+                        "main" -> stringResource(R.string.settings)
+                        "settings" -> stringResource(R.string.main)
+                        else -> stringResource(R.string.button)
+                    }
                 )
             }
             Button(

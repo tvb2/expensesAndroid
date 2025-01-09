@@ -66,31 +66,47 @@ fun SettingsScreen(
 )
 {
     val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
-
     val layoutDirection = LocalLayoutDirection.current
+
     Scaffold(
         bottomBar = {
             AppBottomBar(
+                config = "settings",
                 navigateFirstButton = navigateToMainScreen,
                 title = stringResource(MainScreenDestination.titleRes),
                 canNavigateBack = false,
                 scrollBehavior = scrollBehavior,
                 modifier = Modifier
             )
-        },
-        modifier = TODO(),
-        topBar = TODO(),
-        snackbarHost = TODO(),
-        floatingActionButton = TODO(),
-        floatingActionButtonPosition = TODO(),
-        containerColor = TODO(),
-        contentColor = TODO(),
-        contentWindowInsets = TODO(),
-        content = TODO()
-    )
+        }
+    ){innerPadding ->
+        Column(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxWidth()
+        )
+        {
+            Settings(modifier)
+        }
+    }
 }
 
-    
+@Composable
+fun Settings(modifier: Modifier = Modifier){
+    Column {
+        Text(
+            text = "Settings",
+            modifier = Modifier
+                .padding(2.dp)       // Add padding around each item
+                .background(
+                    Color.LightGray,
+                    shape = RoundedCornerShape(8.dp)
+                ) // Background color for each item
+                .padding(8.dp)// Inner padding within the background
+            )
+    }
+
+}
 
 
 
@@ -100,8 +116,7 @@ fun SettingsScreen(
 fun PreviewMainScr(){
     ExpensesControlTheme {
         SettingsScreen(
-            navigateToMainScreen = TODO(),
-            modifier = TODO()
+            navigateToMainScreen = {}
         )
     }
 }

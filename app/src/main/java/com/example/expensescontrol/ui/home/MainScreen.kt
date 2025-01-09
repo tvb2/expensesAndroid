@@ -72,6 +72,7 @@ fun MainScreen(
     val layoutDirection = LocalLayoutDirection.current
     Scaffold (
         bottomBar = { AppBottomBar(
+            config = "main",
             navigateFirstButton = navigateToSettings,
             title = stringResource(MainScreenDestination.titleRes),
             canNavigateBack = false,
@@ -81,6 +82,7 @@ fun MainScreen(
     ) { innerPadding ->
             Column(
                 modifier = modifier
+                    .padding(innerPadding)
             ) {
                 CategoryChooser(
                     onCategorySelected = { dispatch.updateSelectedCat(it) },

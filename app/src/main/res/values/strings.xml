@@ -26,6 +26,9 @@
 
     <string name="item_entry_title">Add Item</string>
     <string name="no_item_description">Oops!\nNo items in the inventory.\nTap + to add.</string>
+    <string name="settings">Settings</string>
+    <string name="main">Main</string>
+    <string name="button">Button</string>
 
 
 </resources>
