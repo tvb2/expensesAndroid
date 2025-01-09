@@ -24,5 +24,8 @@
     <string name="submit">Submit</string>
     <string name="add_new_category">Add new category</string>
 
+    <string name="item_entry_title">Add Item</string>
+    <string name="no_item_description">Oops!\nNo items in the inventory.\nTap + to add.</string>
+
 
 </resources>

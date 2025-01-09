@@ -41,6 +41,10 @@ android {
 
 dependencies {
     implementation(libs.androidx.media3.common.ktx)
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.ktx)
     val sqlite_version = "2.4.0"
     val lifecycle_version = "2.5.1"
     implementation(libs.androidx.core.ktx)
