@@ -61,7 +61,9 @@ object MainScreenDestination : NavigationDestination {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen(
-    navigateToSettings: () -> Unit,
+    navigateToSettingsScreen: () -> Unit,
+    navigateToStatsScreen: () -> Unit,
+    navigateToAllExpsScreen: () -> Unit,
     modifier: Modifier = Modifier,
     dispatch: Dispatch = viewModel()
 )
@@ -73,7 +75,9 @@ fun MainScreen(
     Scaffold (
         bottomBar = { AppBottomBar(
             config = "main",
-            navigateFirstButton = navigateToSettings,
+            navigateFirstButton = navigateToSettingsScreen,
+            navigateSecondButton = navigateToStatsScreen,
+            navigateThirdButton = navigateToAllExpsScreen,
             title = stringResource(MainScreenDestination.titleRes),
             canNavigateBack = false,
             scrollBehavior = scrollBehavior,
@@ -225,7 +229,9 @@ fun MyDatePicker(modifier: Modifier){
 fun PreviewMainScr(){
     ExpensesControlTheme {
         MainScreen(
-            navigateToSettings = {}
+            navigateToSettingsScreen = {},
+            navigateToStatsScreen = {},
+            navigateToAllExpsScreen = {}
         )
     }
 }

@@ -14,13 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.expensescontrol.R
-import com.example.expensescontrol.ui.home.MainScreenDestination
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppBottomBar(
     config: String = "main",
     navigateFirstButton: () -> Unit,
+    navigateSecondButton: () -> Unit,
+    navigateThirdButton: () -> Unit,
     title: String,
     canNavigateBack: Boolean,
     scrollBehavior: BottomAppBarScrollBehavior,
@@ -39,27 +40,33 @@ fun AppBottomBar(
                 onClick = navigateFirstButton
             ) {
                 Text(
-                    text = when(config){
-                        "main" -> stringResource(R.string.settings)
-                        "settings" -> stringResource(R.string.main)
-                        else -> stringResource(R.string.button)
+                    text = when (config) {
+                        stringResource(R.string.config_main) -> stringResource(R.string.settings)
+                        else -> stringResource(R.string.main)
                     }
                 )
             }
             Button(
-                onClick = {}
+                onClick = navigateSecondButton
             ) {
                 Text(
-                    text = "Stats"
+                    text = when (config) {
+                        stringResource(R.string.config_stats) -> stringResource(R.string.settings)
+                        stringResource(R.string.config_allExps) -> stringResource(R.string.settings)
+                        else -> stringResource(R.string.stats)
+                    }
                 )
             }
             Button(
-                onClick = {}
+                onClick = navigateThirdButton
             ) {
                 Text(
-                    text = "AllExps"
+                    text = when(config){
+                        stringResource(R.string.config_allExps) -> stringResource(R.string.stats)
+                        else -> stringResource(R.string.all_expenses)
+                    }
                 )
+                    }
             }
         }
     }
-}
