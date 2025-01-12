@@ -45,11 +45,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.expensescontrol.ui.theme.ExpensesControlTheme
 import com.example.expensescontrol.model.Category
-import com.example.expensescontrol.model.Dispatch
+import com.example.expensescontrol.ui.home.MainScreenViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.expensescontrol.PreviousExpenses
 import com.example.expensescontrol.R
 import com.example.expensescontrol.ui.AppBottomBar
+import com.example.expensescontrol.ui.AppViewModelProvider
 import com.example.expensescontrol.ui.navigation.NavigationDestination
 
 object MainScreenDestination : NavigationDestination {
@@ -65,12 +66,12 @@ fun MainScreen(
     navigateToStatsScreen: () -> Unit,
     navigateToAllExpsScreen: () -> Unit,
     modifier: Modifier = Modifier,
-    dispatch: Dispatch = viewModel()
+//    viewModel: MainScreenViewModel = viewModel()
 )
 {
     val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
 
-    val uiState by dispatch.expensesUiState.collectAsState()
+//    val uiState by viewModel.expensesUiState.collectAsState()
     val layoutDirection = LocalLayoutDirection.current
     Scaffold (
         bottomBar = { AppBottomBar(
@@ -89,20 +90,20 @@ fun MainScreen(
                     .padding(innerPadding)
             ) {
                 CategoryChooser(
-                    onCategorySelected = { dispatch.updateSelectedCat(it) },
+                    onCategorySelected = {},
                     modifier
 
                 )
                 UserInputCard(
-                    category = dispatch.categorySelected,
-                    onAmountInputChanged = { dispatch.updateInputAmount(it) },
-                    amount = dispatch.amountInput,
+                    category = "viewModel.categorySelected",
+                    onAmountInputChanged = {  },
+                    amount = "viewModel.amountInput",
                     modifier
 
                 )
 
                 PreviousExpenses(
-                    modifier
+                    listOf()
                 )
             }
         }

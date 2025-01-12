@@ -25,8 +25,7 @@
     <string name="add_new_category">Add new category</string>
 
     <string name="item_entry_title">Add Item</string>
-    <string name="no_item_description">Oops!\nNo items in the inventory.\nTap + to add.</string>
-    <string name="settings">Settings</string>
+   <string name="settings">Settings</string>
     <string name="main">Main</string>
     <string name="button">Button</string>
     <string name="stats">Stats</string>
@@ -35,6 +34,7 @@
     <string name="config_settings">settings</string>
     <string name="config_stats">stats</string>
     <string name="config_allExps">allExp</string>
+    <string name="no_items_yet">No Items yet in the database!</string>
 
 
 </resources>

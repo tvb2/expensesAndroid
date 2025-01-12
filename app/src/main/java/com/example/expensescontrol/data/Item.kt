@@ -28,7 +28,14 @@ import androidx.room.PrimaryKey
 data class Item(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val name: String,
-    val price: Double,
-    val quantity: Int
+    val dateCreated: String,
+    val dateModified: String,
+    val category: String,
+    val amount: Double,
+    val currency: String,
+    val exchRate: Double,
+    val finalAmount: Double,
+    val regular: Boolean,
+    val userCreated: String,
+    val userModified: String
 )
