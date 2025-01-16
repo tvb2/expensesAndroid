@@ -39,7 +39,6 @@ import com.example.expensescontrol.ui.stats.StatsScreen
 /**
  * Provides Navigation graph for the application.
  */
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ExpensesNavHost(
     navController: NavHostController,
@@ -78,7 +77,5 @@ fun ExpensesNavHost(
                 navigateToSettingsScreen = {navController.navigate(SettingsDestination.route)  },
             )
         }
-
-
         }
     }

@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.expensescontrol"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.room.common)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.constraintlayout)
+    testImplementation(libs.junit.junit)
     ksp(libs.androidx.room.compiler)
 
 }

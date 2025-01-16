@@ -7,7 +7,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.expensescontrol.ui.navigation.ExpensesNavHost
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ExpensesApp(navController: NavHostController = rememberNavController()) {
     ExpensesNavHost(navController = navController)

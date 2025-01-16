@@ -50,9 +50,9 @@ object AppViewModelProvider {
 //        }
 
         // Initializer for HomeViewModel
-//        initializer {
-//            MainScreenViewModel(expensesApplication().container.itemsRepository)
-//        }
+        initializer {
+            MainScreenViewModel(expensesApplication().container.itemsRepository)
+        }
     }
 }
 
@@ -60,5 +60,5 @@ object AppViewModelProvider {
  * Extension function to queries for [Application] object and returns an instance of
  * [ExpensesApplication].
  */
-//fun CreationExtras.expensesApplication(): ExpensesApplication =
-//    (this[AndroidViewModelFactory.APPLICATION_KEY] as ExpensesApplication)
+fun CreationExtras.expensesApplication(): ExpensesApplication =
+    (this[AndroidViewModelFactory.APPLICATION_KEY] as ExpensesApplication)

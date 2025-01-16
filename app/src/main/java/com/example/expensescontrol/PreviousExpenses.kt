@@ -40,8 +40,8 @@ fun PreviousExpenses(
     list: List<Item>,
     modifier: Modifier = Modifier){
 
-//    val viewModel: MainScreenViewModel = viewModel(); //viewModel(factory = AppViewModelProvider.Factory)
-//    val mainUiState by viewModel.mainUiState.collectAsState()
+    val viewModel: MainScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val mainUiState by viewModel.mainUiState.collectAsState()
 
     Card (  modifier = Modifier
         .padding(8.dp)
