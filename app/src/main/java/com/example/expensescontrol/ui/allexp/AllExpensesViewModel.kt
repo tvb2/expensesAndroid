@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.expensescontrol.ui.home
+package com.example.expensescontrol.ui.allexp
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -39,34 +39,29 @@ import kotlinx.coroutines.flow.stateIn
 /**
  * ViewModel to retrieve all items in the Room database.
  */
-class MainScreenViewModel(): ViewModel() {
-
-    var categorySelected by mutableStateOf("Select category")
-        private set
-
-    var amountInput by mutableStateOf("")
-        private set
-
-    private val _mainUiState = MutableStateFlow(ExpensesUiState())
-    val mainUiState: StateFlow<ExpensesUiState> = _mainUiState.asStateFlow()
-
-    fun onMainScreenCategorySelected(cat: String) {
-        _mainUiState.update { categoryUiState ->
-            categoryUiState.copy(
-                selectedCategory = cat,
+class AllExpensesViewModel(private val itemsRepository: ItemsRepository): ViewModel() {
+    /**
+     * Holds home ui state. The list of items are retrieved from [ItemsRepository] and mapped to
+     * [HomeUiState]
+     */
+    val allExpUiState: StateFlow<AllExpensesUiState> =
+        itemsRepository.getAllItemsStream().map { AllExpensesUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = AllExpensesUiState()
             )
-        }
+
+    companion object {
+        private const val TIMEOUT_MILLIS = 5_000L
     }
 
-    fun updateSelectedCat(newCat: String){
-        if (newCat != "Add new category") {
-            categorySelected = newCat
-        }else{
-            categorySelected = "adding new...."//initiate Add New Category actions
-        }
-    }
+//    private val _allExpensesUiState = MutableStateFlow(ExpensesUiState())
+//    val allExpensesUiState: StateFlow<ExpensesUiState> = _allExpensesUiState.asStateFlow()
 
-    fun updateInputAmount(amount: String){
-        amountInput = amount
-    }
 }
+
+/**
+ * Ui State for AllExpensesScreen
+ */
+data class AllExpensesUiState(val itemList: List<Item> = listOf())

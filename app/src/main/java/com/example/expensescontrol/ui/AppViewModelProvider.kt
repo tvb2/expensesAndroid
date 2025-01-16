@@ -24,6 +24,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.expensescontrol.ui.home.MainScreen
 import com.example.expensescontrol.ExpensesApplication
+import com.example.expensescontrol.ui.allexp.AllExpensesViewModel
 import com.example.expensescontrol.ui.home.MainScreenViewModel
 
 /**
@@ -48,10 +49,14 @@ object AppViewModelProvider {
 //                this.createSavedStateHandle()
 //            )
 //        }
+        // Initializer for ItemDetailsViewModel
+        initializer {
+            AllExpensesViewModel(expensesApplication().container.itemsRepository)
+        }
 
         // Initializer for HomeViewModel
         initializer {
-            MainScreenViewModel(expensesApplication().container.itemsRepository)
+            MainScreenViewModel()
         }
     }
 }

@@ -35,6 +35,9 @@
     <string name="config_stats">stats</string>
     <string name="config_allExps">allExp</string>
     <string name="no_items_yet">No Items yet in the database!</string>
+    <string name="date">Date</string>
+    <string name="category">Category</string>
+    <string name="amount">Amount</string>
 
 
 </resources>

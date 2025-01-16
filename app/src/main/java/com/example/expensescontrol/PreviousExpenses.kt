@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.expensescontrol.data.Item
 import com.example.expensescontrol.ui.AppViewModelProvider
+import com.example.expensescontrol.ui.allexp.AllExpensesViewModel
 import com.example.expensescontrol.ui.home.MainScreenViewModel
 import com.example.expensescontrol.ui.theme.ExpensesControlTheme
 import org.jetbrains.annotations.NotNull
@@ -37,11 +38,10 @@ import java.util.Locale
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PreviousExpenses(
-    list: List<Item>,
     modifier: Modifier = Modifier){
 
-    val viewModel: MainScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
-    val mainUiState by viewModel.mainUiState.collectAsState()
+    val viewModel: AllExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val mainUiState by viewModel.allExpUiState.collectAsState()
 
     Card (  modifier = Modifier
         .padding(8.dp)
@@ -52,7 +52,7 @@ fun PreviousExpenses(
                 bottom = 8.dp
             ))
         ExpenseRecordView(
-            recordsList = list,
+            recordsList = mainUiState.itemList,
             modifier = Modifier
         )
     }
@@ -73,13 +73,13 @@ fun PreviousExpensesHeader(modifier: Modifier = Modifier){
     {
     /* Convert to string Resource */
         Text(
-            text = "Date",
+            text = stringResource(R.string.date),
         )
         Text(
-            text = "Category"
+            text = stringResource(R.string.category)
         )
         Text(
-            text = "Amount"
+            text = stringResource(R.string.amount)
         )
     }
 }
@@ -152,6 +152,6 @@ fun ExpenseRecordView(
 @Composable
 fun PreviewPreviousExpenses(){
     ExpensesControlTheme {
-        PreviousExpenses(listOf())
+        PreviousExpenses()
     }
 }

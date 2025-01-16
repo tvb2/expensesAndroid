@@ -66,9 +66,10 @@ fun MainScreen(
     navigateToStatsScreen: () -> Unit,
     navigateToAllExpsScreen: () -> Unit,
     modifier: Modifier = Modifier,
-//    viewModel: MainScreenViewModel = viewModel()
 )
 {
+    val viewModel: MainScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
+//    val mainUiState by viewModel.mainUiState.collectAsState()
     val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
 
 //    val uiState by viewModel.expensesUiState.collectAsState()
@@ -90,21 +91,19 @@ fun MainScreen(
                     .padding(innerPadding)
             ) {
                 CategoryChooser(
-                    onCategorySelected = {},
+                    onCategorySelected = {viewModel.updateSelectedCat(it)},
                     modifier
 
                 )
                 UserInputCard(
-                    category = "viewModel.categorySelected",
-                    onAmountInputChanged = {  },
-                    amount = "viewModel.amountInput",
+                    category = viewModel.categorySelected,
+                    onAmountInputChanged = { viewModel.updateInputAmount(it) },
+                    amount = viewModel.amountInput,
                     modifier
 
                 )
 
-                PreviousExpenses(
-                    listOf()
-                )
+                PreviousExpenses()
             }
         }
 }
