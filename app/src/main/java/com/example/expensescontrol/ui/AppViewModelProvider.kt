@@ -49,14 +49,14 @@ object AppViewModelProvider {
 //                this.createSavedStateHandle()
 //            )
 //        }
-        // Initializer for ItemDetailsViewModel
+        // Initializer for AllExpensesViewModel
         initializer {
             AllExpensesViewModel(expensesApplication().container.itemsRepository)
         }
 
-        // Initializer for HomeViewModel
+        // Initializer for MainScreenViewModel
         initializer {
-            MainScreenViewModel()
+            MainScreenViewModel(expensesApplication().container.itemsRepository)
         }
     }
 }

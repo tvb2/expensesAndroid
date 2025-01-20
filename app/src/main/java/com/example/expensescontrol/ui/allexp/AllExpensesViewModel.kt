@@ -55,10 +55,6 @@ class AllExpensesViewModel(private val itemsRepository: ItemsRepository): ViewMo
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
-
-//    private val _allExpensesUiState = MutableStateFlow(ExpensesUiState())
-//    val allExpensesUiState: StateFlow<ExpensesUiState> = _allExpensesUiState.asStateFlow()
-
 }
 
 /**
