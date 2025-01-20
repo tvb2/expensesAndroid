@@ -53,6 +53,11 @@ import com.example.expensescontrol.ui.AppViewModelProvider
 import com.example.expensescontrol.ui.navigation.NavigationDestination
 import com.example.expensescontrol.ui.theme.ExpensesControlTheme
 import kotlinx.coroutines.launch
+import network.chaintech.kmp_date_time_picker.ui.datepicker.WheelDatePickerView
+import network.chaintech.kmp_date_time_picker.ui.datepicker.WheelPicker
+import network.chaintech.kmp_date_time_picker.utils.DateTimePickerView
+import network.chaintech.kmp_date_time_picker.utils.now
+import network.chaintech.kmp_date_time_picker.utils.shortDayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
@@ -165,6 +170,7 @@ fun UserInputCard(
     onAmountInputChanged: (String) -> Unit,
     amount: String,
     modifier: Modifier = Modifier){
+    val mainUiState by viewModel.mainUiState.collectAsState()
     var checkedToday by remember { mutableStateOf(true) }
     var submitEnabled by remember { mutableStateOf(true) }
     Card(
@@ -173,16 +179,12 @@ fun UserInputCard(
     )
     {
         val coroutineScope = rememberCoroutineScope()
-
-        val localDate = LocalDateTime.now()
-        val offsetDate = OffsetDateTime.of(localDate, OffsetDateTime.now().offset)
-        val formattedDate = offsetDate.toString()
-
+        var showDatePicker by remember { mutableStateOf(false) }
 
         val item = Item(
 //            id = 1,
-            dateCreated = formattedDate,
-            dateModified = formattedDate,
+            dateCreated = mainUiState.createdDate,
+            dateModified = mainUiState.modifiedDated,
             category = "Grocery",
             amount = 123.4,
             currency = "CAD",
@@ -214,17 +216,34 @@ fun UserInputCard(
         )
         Checkbox(
             checked = checkedToday,
-            onCheckedChange = { checkedToday = it },
+            onCheckedChange = {
+                checkedToday = it
+                showDatePicker =
+                    if(!checkedToday)
+                        !showDatePicker
+                    else showDatePicker
+            },
             modifier = Modifier.padding(0.dp)
             )
     }
-    if (!checkedToday) {
-        /*
-        MyDatePicker(
-            modifier = Modifier.padding(top = 10.dp)
+        WheelDatePickerView(
+            showDatePicker = showDatePicker,
+            title = "Select expense date",
+            height = 200.dp,
+            dateTimePickerView = DateTimePickerView.DIALOG_VIEW,
+            yearsRange = 2024 ..LocalDate.now().year,
+            maxDate = kotlinx.datetime.LocalDate.now(),
+            showShortMonths = true,
+            onDoneClick = {
+                showDatePicker = false
+                println("DONE: $it")
+            },
+            onDismiss = {
+                showDatePicker = false
+                println("Dismissed.")
+                checkedToday = true
+            }
         )
-        */
-    }
     Button(modifier = Modifier
         .align(Alignment.End),
         enabled = submitEnabled,
@@ -242,14 +261,11 @@ fun UserInputCard(
 //requires additional work
 @OptIn (ExperimentalMaterial3Api::class)
 @Composable
-fun MyDatePicker(modifier: Modifier){
-    val dateState = rememberDatePickerState(
-        initialDisplayMode = DisplayMode.Input
-    )
-    DatePicker(state = dateState,
-        showModeToggle = true,
-        title = {},
-        headline = {})
+fun MyDatePicker(
+    showDatePicker: Boolean,
+    modifier: Modifier){
+
+
 }
 
 

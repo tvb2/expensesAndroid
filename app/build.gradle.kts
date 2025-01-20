@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.room.common)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.constraintlayout)
+    implementation("network.chaintech:kmp-date-time-picker:1.0.7")
     testImplementation(libs.junit.junit)
     ksp(libs.androidx.room.compiler)
 

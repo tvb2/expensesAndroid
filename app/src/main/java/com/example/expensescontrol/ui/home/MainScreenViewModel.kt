@@ -39,6 +39,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.text.NumberFormat
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 /**
  * ViewModel to retrieve all items in the Room database.
@@ -59,6 +61,18 @@ class MainScreenViewModel(private val itemsRepository: ItemsRepository): ViewMod
     val currency = "CAD"
     val user = "tvb2"
     val rate: Double = 1.0
+
+    val modifiedDate =
+        OffsetDateTime.of(
+            LocalDateTime.now(),
+            OffsetDateTime.now().offset)
+        .toString()
+
+    val createdDate =
+        OffsetDateTime.of(
+            LocalDateTime.now(),
+            OffsetDateTime.now().offset)
+            .toString()
 
     var categorySelected by mutableStateOf("Select category")
         private set
