@@ -2,6 +2,7 @@ package com.example.expensescontrol
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -110,18 +112,30 @@ fun ExpenseRecordView(
        verticalAlignment = Alignment.CenterVertically,
        horizontalArrangement = Arrangement.SpaceEvenly
    ) {
-
+       Column(modifier = modifier
+           .weight(1F),
+           horizontalAlignment = Alignment.Start
+           ) {
            Text(
                text = record.category
            )
-
+       }
+        Column(modifier = modifier
+            .weight(1F),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = record.finalAmount.toString(),
+            )
+        }
+       Column (modifier = modifier
+           .weight(1F),
+           horizontalAlignment = Alignment.End
+       ) {
            Text(
-               text = record.finalAmount.toString()
+               text = record.dateCreated
            )
-
-           Text(
-                   text = record.dateCreated
-           )
+       }
        }
  }
 
