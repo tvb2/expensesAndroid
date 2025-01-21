@@ -39,6 +39,7 @@
     <string name="category">Category</string>
     <string name="amount">Amount</string>
     <string name="default_select_category">Select category</string>
+    <string name="non_regular">Add non-regular</string>
 
 
 </resources>

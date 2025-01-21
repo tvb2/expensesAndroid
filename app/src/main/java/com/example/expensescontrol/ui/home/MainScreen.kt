@@ -224,6 +224,21 @@ fun UserInputCard(
             },
             modifier = Modifier.padding(0.dp)
             )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.End
+        ) {
+            Button(
+                onClick = {
+
+                }
+            ) {
+                Text(
+                    text = stringResource(R.string.non_regular)
+                )
+            }
+        }
     }
         WheelDatePickerView(
             showDatePicker = showDatePicker,
