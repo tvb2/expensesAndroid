@@ -104,12 +104,9 @@ fun MainScreen(
                 CategoryChooser(
                     onCategorySelected = {viewModel.updateSelectedCat(it)},
                     modifier
-
                 )
                 UserInputCard(
                     viewModel = viewModel,
-                    onAmountInputChanged = { viewModel.updateInputAmount(it) },
-                    amount = viewModel.amountInput,
                     modifier
                 )
 
@@ -125,10 +122,9 @@ fun CategoryChooser(
     onCategorySelected: (String) -> Unit,
     modifier: Modifier = Modifier) {
 
-    val c: Category = Category()
+    val c = Category()
     val categories =  remember{c.cat}
 
-//    var iterate = cats.listIterator()
     LazyRow(
         state = rememberLazyListState(),
         contentPadding = PaddingValues(
@@ -167,8 +163,6 @@ fun CategoryChooser(
 @Composable
 fun UserInputCard(
     viewModel: MainScreenViewModel,
-    onAmountInputChanged: (String) -> Unit,
-    amount: String,
     modifier: Modifier = Modifier){
     val mainUiState by viewModel.mainUiState.collectAsState()
     var checkedToday by remember { mutableStateOf(true) }
@@ -180,16 +174,17 @@ fun UserInputCard(
     {
         val coroutineScope = rememberCoroutineScope()
         var showDatePicker by remember { mutableStateOf(false) }
+        submitEnabled = viewModel.validateSubmitInput()
 
         val item = Item(
 //            id = 1,
-            dateCreated = mainUiState.createdDate,
-            dateModified = mainUiState.modifiedDated,
-            category = "Grocery",
-            amount = 123.4,
+            dateCreated = mainUiState.dateCreated,
+            dateTimeModified = mainUiState.dateTimeModified,
+            category = mainUiState.selectedCategory,
+            amount = mainUiState.amount,
             currency = "CAD",
             exchRate = 1.0,
-            finalAmount = 123.4,
+            finalAmount = mainUiState.finalAmount,
             regular = true,
             userCreated = "tvb2",
             userModified = "tvb2"
@@ -199,8 +194,8 @@ fun UserInputCard(
         modifier = modifier.padding(start = 8.dp),
     )
     OutlinedTextField(
-        value = amount,
-        onValueChange = onAmountInputChanged,
+        value = viewModel.amountInput,
+        onValueChange = {viewModel.updateInputAmount(it)},
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth(),
@@ -218,10 +213,14 @@ fun UserInputCard(
             checked = checkedToday,
             onCheckedChange = {
                 checkedToday = it
-                showDatePicker =
-                    if(!checkedToday)
-                        !showDatePicker
-                    else showDatePicker
+                if (checkedToday){
+                    showDatePicker = false
+                    viewModel.onCheckedTodayChecked()
+                }
+                else{
+                    showDatePicker = true
+
+                }
             },
             modifier = Modifier.padding(0.dp)
             )
@@ -237,18 +236,25 @@ fun UserInputCard(
             onDoneClick = {
                 showDatePicker = false
                 println("DONE: $it")
+                viewModel.onCreatedDateChange(it)
             },
             onDismiss = {
                 showDatePicker = false
                 println("Dismissed.")
                 checkedToday = true
+                viewModel.onCheckedTodayChecked()
             }
         )
     Button(modifier = Modifier
         .align(Alignment.End),
-        enabled = submitEnabled,
-        onClick = {coroutineScope.launch {
+        enabled = viewModel.validateSubmitInput(),
+        onClick = {
+            viewModel.updateDateTimeModified()
+            coroutineScope.launch {
             viewModel.addNewExpense(item)
+            viewModel.updateInputAmount("")
+            viewModel.updateSelectedCat("Select category")
+            checkedToday = true
         } }
     ) {
         Text(
@@ -257,17 +263,6 @@ fun UserInputCard(
     }
     }
 }
-
-//requires additional work
-@OptIn (ExperimentalMaterial3Api::class)
-@Composable
-fun MyDatePicker(
-    showDatePicker: Boolean,
-    modifier: Modifier){
-
-
-}
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview

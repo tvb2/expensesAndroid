@@ -38,6 +38,11 @@ import com.example.expensescontrol.ui.allexp.AllExpensesUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format
+import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.char
+import network.chaintech.kmp_date_time_picker.utils.now
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
@@ -62,18 +67,6 @@ class MainScreenViewModel(private val itemsRepository: ItemsRepository): ViewMod
     val user = "tvb2"
     val rate: Double = 1.0
 
-    val modifiedDate =
-        OffsetDateTime.of(
-            LocalDateTime.now(),
-            OffsetDateTime.now().offset)
-        .toString()
-
-    val createdDate =
-        OffsetDateTime.of(
-            LocalDateTime.now(),
-            OffsetDateTime.now().offset)
-            .toString()
-
     var categorySelected by mutableStateOf("Select category")
         private set
 
@@ -83,17 +76,13 @@ class MainScreenViewModel(private val itemsRepository: ItemsRepository): ViewMod
     private val _mainUiState = MutableStateFlow(ExpensesUiState())
     val mainUiState: StateFlow<ExpensesUiState> = _mainUiState.asStateFlow()
 
-    fun onMainScreenCategorySelected(cat: String) {
-        _mainUiState.update { categoryUiState ->
-            categoryUiState.copy(
-                selectedCategory = cat,
-            )
-        }
-    }
-
     fun updateSelectedCat(newCat: String){
         if (newCat != "Add new category") {
             categorySelected = newCat
+            _mainUiState.update { createdDateUiState ->
+                createdDateUiState.copy(
+                    selectedCategory = newCat
+                )}
         }else{
             categorySelected = "adding new...."//initiate Add New Category actions
         }
@@ -101,9 +90,63 @@ class MainScreenViewModel(private val itemsRepository: ItemsRepository): ViewMod
 
     fun updateInputAmount(amount: String){
         amountInput = amount
+        _mainUiState.update { amountUiState ->
+            amountUiState.copy(
+                    amount =
+                        if(amount.isEmpty()) 0.0
+                        else amount.toDouble(),
+                    finalAmount =
+                        if(amount.isEmpty()) 0.0
+                        else amount.toDouble()* rate
+
+            )
+        }
+}
+
+    fun onCheckedTodayChecked(){
+        val currentDate = LocalDate.now()
+        val customFormat = LocalDate.Format {
+            monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); dayOfMonth(); chars(", "); year()
+        }
+        val date: String = currentDate.format(customFormat)
+        _mainUiState.update { createdDateUiState ->
+            createdDateUiState.copy(
+                dateCreated = date
+            )
+        }
     }
 
+    fun onCreatedDateChange(newDate: LocalDate){
+        val customFormat = LocalDate.Format {
+            monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); dayOfMonth(); chars(", "); year()
+        }
+        val date: String = newDate.format(customFormat)
+        _mainUiState.update { createdDateUiState ->
+            createdDateUiState.copy(
+                dateCreated = date
+            )
+        }
+    }
 
+    fun updateDateTimeModified(){
+        _mainUiState.update { dateTimeModifiedUiState ->
+            dateTimeModifiedUiState.copy(
+                dateTimeModified = OffsetDateTime
+                    .of(
+                        LocalDateTime.now(),
+                        OffsetDateTime.now().offset
+                    )
+                    .toString(),
+            )
+        }
+    }
+
+    fun validateSubmitInput(): Boolean {
+        return (
+                _mainUiState.value.selectedCategory != "Nonsense" &&
+                _mainUiState.value.amount != 0.0
+                )
+    }
     /**
      * Holds current item ui state
      */
@@ -141,7 +184,7 @@ data class ItemUiState(
 data class ItemDetails(
     val id: Int = 0,
     val dateCreated: String = "Jan 31, 2024",//MMM dd, yyyy
-    val dateModified: String = "Jan 31, 2024",
+    val dateTimeModified: String = "Jan 31, 2024",
     val category: String = "Grocery",
     val amount: Double = 1.01,
     val currency: String = "CAD",
@@ -160,7 +203,7 @@ fun ItemDetails.toItem(): Item = Item(
     id = id,
     category = category,
     dateCreated = dateCreated,
-    dateModified = dateModified,
+    dateTimeModified = dateTimeModified,
     amount = amount,
     currency = currency,
     exchRate = exchRate,
@@ -189,7 +232,7 @@ fun Item.toItemDetails(): ItemDetails = ItemDetails(
     id = id,
     category = category,
     dateCreated = dateCreated,
-    dateModified = dateModified,
+    dateTimeModified = dateTimeModified,
     amount = amount,
     currency = currency,
     exchRate = exchRate,

@@ -29,7 +29,7 @@ data class Item(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val dateCreated: String,
-    val dateModified: String,
+    val dateTimeModified: String,
     val category: String,
     val amount: Double,
     val currency: String,

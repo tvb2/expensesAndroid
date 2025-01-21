@@ -38,6 +38,7 @@
     <string name="date">Date</string>
     <string name="category">Category</string>
     <string name="amount">Amount</string>
+    <string name="default_select_category">Select category</string>
 
 
 </resources>
