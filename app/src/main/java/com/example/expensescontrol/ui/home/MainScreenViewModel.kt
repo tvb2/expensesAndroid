@@ -67,7 +67,7 @@ class MainScreenViewModel(private val itemsRepository: ItemsRepository): ViewMod
     val user = "tvb2"
     val rate: Double = 1.0
 
-    var categorySelected by mutableStateOf("Select category")
+    var categorySelected by mutableStateOf("")
         private set
 
     var amountInput by mutableStateOf("")
@@ -79,8 +79,8 @@ class MainScreenViewModel(private val itemsRepository: ItemsRepository): ViewMod
     fun updateSelectedCat(newCat: String){
         if (newCat != "Add new category") {
             categorySelected = newCat
-            _mainUiState.update { createdDateUiState ->
-                createdDateUiState.copy(
+            _mainUiState.update { selectedCatUiState ->
+                selectedCatUiState.copy(
                     selectedCategory = newCat
                 )}
         }else{
@@ -147,6 +147,7 @@ class MainScreenViewModel(private val itemsRepository: ItemsRepository): ViewMod
                 _mainUiState.value.amount != 0.0
                 )
     }
+
     /**
      * Holds current item ui state
      */

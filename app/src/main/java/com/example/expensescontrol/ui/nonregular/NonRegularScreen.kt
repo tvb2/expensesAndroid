@@ -1,4 +1,4 @@
-package com.example.expensescontrol.ui.home
+package com.example.expensescontrol.ui.nonregular
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -20,14 +20,11 @@ import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -50,34 +47,27 @@ import com.example.expensescontrol.data.Item
 import com.example.expensescontrol.model.Category
 import com.example.expensescontrol.ui.AppBottomBar
 import com.example.expensescontrol.ui.AppViewModelProvider
+import com.example.expensescontrol.ui.home.MainScreenViewModel
 import com.example.expensescontrol.ui.navigation.NavigationDestination
 import com.example.expensescontrol.ui.theme.ExpensesControlTheme
 import kotlinx.coroutines.launch
 import network.chaintech.kmp_date_time_picker.ui.datepicker.WheelDatePickerView
-import network.chaintech.kmp_date_time_picker.ui.datepicker.WheelPicker
 import network.chaintech.kmp_date_time_picker.utils.DateTimePickerView
 import network.chaintech.kmp_date_time_picker.utils.now
-import network.chaintech.kmp_date_time_picker.utils.shortDayOfWeek
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 
 
-object MainScreenDestination : NavigationDestination {
-    override val route = "home"
+object NonRegularScreenDestination : NavigationDestination {
+    override val route = "nonregular"
     override val titleRes = R.string.app_name
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainScreen(
-    navigateToSettingsScreen: () -> Unit,
-    navigateToStatsScreen: () -> Unit,
-    navigateToAllExpsScreen: () -> Unit,
-    navigateAddNonRegular: () -> Unit,
+fun NonRegularScreen(
     modifier: Modifier = Modifier,
+    navigateToMainScreen: () -> Unit,
     viewModel: MainScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 
 )
@@ -87,85 +77,24 @@ fun MainScreen(
 
     val layoutDirection = LocalLayoutDirection.current
     Scaffold (
-        bottomBar = { AppBottomBar(
-            config = "main",
-            navigateFirstButton = navigateToSettingsScreen,
-            navigateSecondButton = navigateToStatsScreen,
-            navigateThirdButton = navigateToAllExpsScreen,
-            title = stringResource(MainScreenDestination.titleRes),
-            canNavigateBack = false,
-            scrollBehavior = scrollBehavior,
-            modifier = Modifier)
-        }
     ) { innerPadding ->
             Column(
                 modifier = modifier
                     .padding(innerPadding)
             ) {
-                CategoryChooser(
-                    onCategorySelected = {viewModel.updateSelectedCat(it)},
-                    modifier
-                )
                 UserInputCard(
                     viewModel = viewModel,
-                    navigateAddNonRegular = navigateAddNonRegular,
+                    navigateToMainScreen =navigateToMainScreen,
                     modifier
-                )
-
-                AllExpenses(
-                    itemList = mainUiState.itemList
                 )
             }
         }
 }
 
 @Composable
-fun CategoryChooser(
-    onCategorySelected: (String) -> Unit,
-    modifier: Modifier = Modifier) {
-
-    val c = Category()
-    val categories =  remember{c.cat}
-
-    LazyRow(
-        state = rememberLazyListState(),
-        contentPadding = PaddingValues(
-            top = 20.dp,
-            bottom = 4.dp,
-            start = 4.dp,
-            end = 4.dp),
-        reverseLayout = false,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .padding(top = 20.dp),
-        flingBehavior = ScrollableDefaults.flingBehavior(),
-        userScrollEnabled = true
-
-    ) {
-        items(categories, key = { item -> item }) { category ->
-            Text(
-                text = category,
-                modifier = Modifier
-                    .padding(2.dp)       // Add padding around each item
-                    .background(
-                        Color.LightGray,
-                        shape = RoundedCornerShape(8.dp)
-                    ) // Background color for each item
-                    .padding(8.dp)// Inner padding within the background
-                    .clickable { onCategorySelected(category) },
-                style = MaterialTheme.typography.bodyLarge,
-
-            )
-        }
-
-    }
-}
-
-@Composable
 fun UserInputCard(
     viewModel: MainScreenViewModel,
-    navigateAddNonRegular: () -> Unit,
+    navigateToMainScreen: () -> Unit,
     modifier: Modifier = Modifier){
     val mainUiState by viewModel.mainUiState.collectAsState()
     var checkedToday by remember { mutableStateOf(true) }
@@ -180,21 +109,26 @@ fun UserInputCard(
         submitEnabled = viewModel.validateSubmitInput()
 
         val item = Item(
-//            id = 1,
             dateCreated = mainUiState.dateCreated,
             dateTimeModified = mainUiState.dateTimeModified,
-            category = mainUiState.selectedCategory,
+            category = viewModel.categorySelected,
             amount = mainUiState.amount,
             currency = "CAD",
             exchRate = 1.0,
             finalAmount = mainUiState.finalAmount,
-            regular = true,
+            regular = false,
             userCreated = "tvb2",
             userModified = "tvb2"
         )
-    Text(
-        text = "Category: " + viewModel.categorySelected,
-        modifier = modifier.padding(start = 8.dp),
+    OutlinedTextField(
+        value = viewModel.categorySelected,
+        onValueChange = {viewModel.updateSelectedCat(it)},
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        label = {Text(stringResource(R.string.enter_non_regular_description))}
     )
     OutlinedTextField(
         value = viewModel.amountInput,
@@ -227,19 +161,6 @@ fun UserInputCard(
             },
             modifier = Modifier.padding(0.dp)
             )
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.End
-        ) {
-            Button(
-                onClick = navigateAddNonRegular
-            ) {
-                Text(
-                    text = stringResource(R.string.non_regular)
-                )
-            }
-        }
     }
         WheelDatePickerView(
             showDatePicker = showDatePicker,
@@ -261,22 +182,35 @@ fun UserInputCard(
                 viewModel.onCheckedTodayChecked()
             }
         )
-    Button(modifier = Modifier
-        .align(Alignment.End),
-        enabled = viewModel.validateSubmitInput(),
-        onClick = {
-            viewModel.updateDateTimeModified()
-            coroutineScope.launch {
-            viewModel.addNewExpense(item)
-            viewModel.updateInputAmount("")
-            viewModel.updateSelectedCat("Select category")
-            checkedToday = true
-        } }
+    Row(modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Text(
-            text = stringResource(R.string.submit)
-        )
+        Button(
+            onClick = navigateToMainScreen
+        ) {
+            Text(
+                text = stringResource(R.string.cancel)
+            )
+        }
+        Button(
+            enabled = viewModel.validateSubmitInput(),
+            onClick = {
+                viewModel.updateDateTimeModified()
+                coroutineScope.launch {
+                viewModel.addNewExpense(item)
+                viewModel.updateInputAmount("")
+                viewModel.updateSelectedCat("Select category")
+                checkedToday = true
+                    navigateToMainScreen()
+            } }
+        ) {
+            Text(
+                text = stringResource(R.string.submit)
+            )
+        }
     }
+
     }
 }
 
@@ -285,11 +219,8 @@ fun UserInputCard(
 @Composable
 fun PreviewMainScr(){
     ExpensesControlTheme {
-        MainScreen(
-            navigateToSettingsScreen = {},
-            navigateToStatsScreen = {},
-            navigateToAllExpsScreen = {},
-            navigateAddNonRegular = {}
+        NonRegularScreen(
+            navigateToMainScreen = {}
         )
     }
 }

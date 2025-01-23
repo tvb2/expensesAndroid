@@ -40,6 +40,8 @@
     <string name="amount">Amount</string>
     <string name="default_select_category">Select category</string>
     <string name="non_regular">Add non-regular</string>
+    <string name="enter_non_regular_description">Enter short description of expense:</string>
+    <string name="cancel">Cancel</string>
 
 
 </resources>
