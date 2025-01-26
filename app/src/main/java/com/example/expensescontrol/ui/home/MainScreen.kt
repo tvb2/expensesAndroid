@@ -111,7 +111,6 @@ fun MainScreen(
                     navigateAddNonRegular = navigateAddNonRegular,
                     modifier
                 )
-
                 AllExpenses(
                     itemList = mainUiState.itemList
                 )

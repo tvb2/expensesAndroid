@@ -34,9 +34,6 @@ fun AllExpenses(
     itemList: List<Item>,
     modifier: Modifier = Modifier){
 
-//    val viewModel: AllExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory)
-//    val allExpensesUiState by viewModel.allExpUiState.collectAsState()
-
     Card (  modifier = Modifier
         .padding(8.dp)
 //        .height(250.dp)

@@ -35,6 +35,7 @@ import java.util.Date
 import com.example.expensescontrol.data.Item
 import com.example.expensescontrol.data.ItemsRepository
 import com.example.expensescontrol.ui.allexp.AllExpensesUiState
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -52,17 +53,31 @@ import java.time.OffsetDateTime
  */
 class MainScreenViewModel(private val itemsRepository: ItemsRepository): ViewModel() {
 
+    private val isAscending: Boolean = false // Change this as needed
+
     val mainScreenRepoUiState: StateFlow<AllExpensesUiState> =
-        itemsRepository.getAllItemsStream().map { AllExpensesUiState(it) }
+        itemsRepository.getAllItemsStream().map {items ->
+            val sortedItems = listSorted(items, isAscending)
+
+//    { items ->
+//    // Sort items based on the desired column sortedByDescending or sortedBy for ascending order
+//    val sortedItems = if (isAscending) {
+//        items.sortedBy { it.dateTimeModified } // Change columnToSortBy to your desired column
+//    } else {
+//        items.sortedByDescending { it.dateTimeModified }
+//    }
+//
+    AllExpensesUiState(sortedItems)
+        }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = AllExpensesUiState()
             )
-
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
+
     val currency = "CAD"
     val user = "tvb2"
     val rate: Double = 1.0
@@ -86,6 +101,16 @@ class MainScreenViewModel(private val itemsRepository: ItemsRepository): ViewMod
         }else{
             categorySelected = "adding new...."//initiate Add New Category actions
         }
+    }
+
+    fun listSorted(items: List<Item>, isAscending: Boolean = false): List<Item>{
+        // Sort items based on the desired column sortedByDescending or sortedBy for ascending order
+        val sortedlist = if (isAscending) {
+            items.sortedBy { it.dateTimeModified } // Change columnToSortBy to your desired column
+        } else {
+            items.sortedByDescending { it.dateTimeModified }
+        }
+        return sortedlist
     }
 
     fun updateInputAmount(amount: String){
