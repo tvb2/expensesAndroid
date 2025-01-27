@@ -79,7 +79,6 @@ fun MainScreen(
     navigateAddNonRegular: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: MainScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
-
 )
 {
     val mainUiState by viewModel.mainScreenRepoUiState.collectAsState()
@@ -112,6 +111,7 @@ fun MainScreen(
                     modifier
                 )
                 AllExpenses(
+                    itemClicked = navigateToAllExpsScreen,
                     itemList = mainUiState.itemList
                 )
             }

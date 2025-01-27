@@ -2,9 +2,13 @@ package com.example.expensescontrol
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+//import androidx.compose.foundation.layout.FlowRowScopeInstance.weight
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,15 +17,27 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.expensescontrol.data.Item
+import com.example.expensescontrol.ui.AppViewModelProvider
+import com.example.expensescontrol.ui.allexp.AllExpensesViewModel
+import com.example.expensescontrol.ui.home.MainScreenViewModel
 import com.example.expensescontrol.ui.theme.ExpensesControlTheme
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
 import network.chaintech.kmp_date_time_picker.utils.now
@@ -32,25 +48,29 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun AllExpenses(
     itemList: List<Item>,
+    itemClicked: () -> Unit,
     modifier: Modifier = Modifier){
 
     Card (  modifier = Modifier
         .padding(8.dp)
-//        .height(250.dp)
     ) {
-        AllExpensesHeader(modifier = Modifier
+        AllExpensesHeader(
+            modifier = Modifier
             .padding(
                 bottom = 8.dp
             ))
+
         ExpenseRecordView(
             recordsList = itemList,
+            itemClicked = itemClicked,
             modifier = Modifier
         )
     }
 }
 
 @Composable
-fun AllExpensesHeader(modifier: Modifier = Modifier){
+fun AllExpensesHeader(
+    modifier: Modifier = Modifier){
     Row(modifier = Modifier
         .padding(
             start = 10.dp,
@@ -59,34 +79,35 @@ fun AllExpensesHeader(modifier: Modifier = Modifier){
         .fillMaxWidth()
         .height(60.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly
+        horizontalArrangement = Arrangement.SpaceBetween
     )
     {
-    /* Convert to string Resource */
+
         Text(
-            text = stringResource(R.string.date),
-        )
-        Text(
-            text = stringResource(R.string.category)
+            text = stringResource(R.string.category),
         )
         Text(
             text = stringResource(R.string.amount)
         )
+        Text(
+            text = stringResource(R.string.date)
+        )
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ExpenseRecordView(
     recordsList: List<Item>,
+    itemClicked: () -> Unit,
     modifier: Modifier) {
 
     Card(modifier = Modifier) {
         Column(modifier = Modifier.fillMaxWidth())
         {
-            LazyColumn(modifier = modifier) {
+            LazyColumn(modifier = modifier){
                 items(recordsList) { oldExpenses ->
-                    PerviousExpensesCard(
+                    PreviousExpensesCard(
+                        itemClicked,
                         oldExpenses
                     )
                 }
@@ -95,12 +116,19 @@ fun ExpenseRecordView(
     }
 }
 
- @RequiresApi(Build.VERSION_CODES.O)
+ @OptIn(ExperimentalFoundationApi::class)
  @Composable
- fun PerviousExpensesCard(
+ fun PreviousExpensesCard(
+     itemClicked: () -> Unit,
      record: Item,
+     viewModel: AllExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory),
      modifier: Modifier = Modifier){
+     var menuIsVisible by remember { mutableStateOf(false) }
    Row(modifier = Modifier
+           .combinedClickable(
+        onClick =  {itemClicked.invoke()},
+       onLongClick = {menuIsVisible = true},
+       onLongClickLabel = "Menu options")
        .padding(
            top = 16.dp,
            bottom = 16.dp
@@ -133,8 +161,49 @@ fun ExpenseRecordView(
                text = record.dateCreated
            )
        }
+       PreviousItemDropdownMenu(
+           item = record,
+           menuIsVisible = menuIsVisible,
+           toggleVisibility = {menuIsVisible = false},
+           viewModel = viewModel
+       )
        }
  }
+
+@Composable
+fun PreviousItemDropdownMenu(
+    menuIsVisible: Boolean,
+    viewModel: AllExpensesViewModel,
+    toggleVisibility: () -> Unit,
+    item: Item,
+) {
+    val coroutineScope = rememberCoroutineScope()
+    var expanded by remember { mutableStateOf(false) }
+    expanded = menuIsVisible
+    Box(
+        modifier = Modifier
+            .padding(16.dp)
+    ) {
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = toggleVisibility
+        ) {
+            DropdownMenuItem(
+                text = { Text("Option 1") },
+                onClick = { /* Do something... */ }
+            )
+            DropdownMenuItem(
+                text = { Text("Delete item") },
+                onClick = {
+                    coroutineScope.launch {
+                        viewModel.deleteExpense(item)
+                    }
+                    toggleVisibility()
+                }
+            )
+        }
+    }
+}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview

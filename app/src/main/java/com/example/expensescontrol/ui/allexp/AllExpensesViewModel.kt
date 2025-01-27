@@ -35,6 +35,7 @@ import com.example.expensescontrol.data.ItemsRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import java.text.NumberFormat
 
 /**
  * ViewModel to retrieve all items in the Room database.
@@ -55,8 +56,11 @@ class AllExpensesViewModel(private val itemsRepository: ItemsRepository): ViewMo
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
-}
 
+    suspend fun deleteExpense(item: Item){
+        itemsRepository.deleteItem(item)
+    }
+}
 /**
  * Ui State for AllExpensesScreen
  */

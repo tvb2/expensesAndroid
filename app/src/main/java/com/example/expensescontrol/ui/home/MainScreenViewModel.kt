@@ -59,14 +59,6 @@ class MainScreenViewModel(private val itemsRepository: ItemsRepository): ViewMod
         itemsRepository.getAllItemsStream().map {items ->
             val sortedItems = listSorted(items, isAscending)
 
-//    { items ->
-//    // Sort items based on the desired column sortedByDescending or sortedBy for ascending order
-//    val sortedItems = if (isAscending) {
-//        items.sortedBy { it.dateTimeModified } // Change columnToSortBy to your desired column
-//    } else {
-//        items.sortedByDescending { it.dateTimeModified }
-//    }
-//
     AllExpensesUiState(sortedItems)
         }
             .stateIn(
@@ -189,7 +181,11 @@ class MainScreenViewModel(private val itemsRepository: ItemsRepository): ViewMod
     }
 
     suspend fun addNewExpense(item: Item){
-        itemsRepository.insertItem(item)//(itemUiState.itemDetails.toItem())
+        itemsRepository.insertItem(item)
+    }
+
+    suspend fun deleteExpense(item: Item){
+        itemsRepository.deleteItem(item)
     }
 
     private fun validateInput(uiState: ItemDetails = itemUiState.itemDetails): Boolean {
