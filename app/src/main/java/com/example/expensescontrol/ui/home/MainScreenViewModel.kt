@@ -17,10 +17,8 @@
 package com.example.expensescontrol.ui.home
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.expensescontrol.model.ExpensesUiState
@@ -31,26 +29,17 @@ import kotlinx.coroutines.flow.update
 import com.example.expensescontrol.data.Item
 import com.example.expensescontrol.data.ItemsRepository
 import com.example.expensescontrol.ui.allexp.AllExpensesUiState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.char
 import network.chaintech.kmp_date_time_picker.utils.now
-import org.json.JSONArray
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
-import kotlinx.coroutines.withContext
-import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 
 
 /**
@@ -173,10 +162,17 @@ class MainScreenViewModel(
         }
     }
 
-    fun validateSubmitInput(): Boolean {
+    fun validateRegularSubmitInput(): Boolean {
         return (
                 categoriesList.contains(_mainUiState.value.selectedCategory) &&
                 _mainUiState.value.amount != 0.0
+                )
+    }
+
+    fun validateNonRegularSubmitInput(): Boolean {
+        return (
+                _mainUiState.value.selectedCategory.isNotEmpty() &&
+                        _mainUiState.value.amount != 0.0
                 )
     }
 

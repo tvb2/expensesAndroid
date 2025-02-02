@@ -245,7 +245,7 @@ fun UserInputCard(
     {
         val coroutineScope = rememberCoroutineScope()
         var showDatePicker by remember { mutableStateOf(false) }
-        submitEnabled = viewModel.validateSubmitInput()
+        submitEnabled = viewModel.validateRegularSubmitInput()
 
         val item = Item(
 //            id = 1,
@@ -331,7 +331,7 @@ fun UserInputCard(
         )
     Button(modifier = Modifier
         .align(Alignment.End),
-        enabled = viewModel.validateSubmitInput(),
+        enabled = viewModel.validateRegularSubmitInput(),
         onClick = {
             viewModel.updateDateTimeModified()
             coroutineScope.launch {

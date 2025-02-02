@@ -2,26 +2,17 @@ package com.example.expensescontrol.ui.nonregular
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,19 +23,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.expensescontrol.AllExpenses
 import com.example.expensescontrol.R
 import com.example.expensescontrol.data.Item
-import com.example.expensescontrol.ui.AppBottomBar
 import com.example.expensescontrol.ui.AppViewModelProvider
 import com.example.expensescontrol.ui.home.MainScreenViewModel
 import com.example.expensescontrol.ui.navigation.NavigationDestination
@@ -97,7 +84,8 @@ fun UserInputCard(
     modifier: Modifier = Modifier){
     val mainUiState by viewModel.mainUiState.collectAsState()
     var checkedToday by remember { mutableStateOf(true) }
-    var submitEnabled by remember { mutableStateOf(true) }
+    var submitEnabled by remember { mutableStateOf(false) }
+    viewModel.updateSelectedCat("")
     Card(
         modifier = Modifier
             .padding(8.dp),
@@ -105,7 +93,7 @@ fun UserInputCard(
     {
         val coroutineScope = rememberCoroutineScope()
         var showDatePicker by remember { mutableStateOf(false) }
-        submitEnabled = viewModel.validateSubmitInput()
+        submitEnabled = viewModel.validateNonRegularSubmitInput()
 
         val item = Item(
             dateCreated = mainUiState.dateCreated,
@@ -193,7 +181,7 @@ fun UserInputCard(
             )
         }
         Button(
-            enabled = viewModel.validateSubmitInput(),
+            enabled = submitEnabled,
             onClick = {
                 viewModel.updateDateTimeModified()
                 coroutineScope.launch {
