@@ -42,6 +42,7 @@
     <string name="non_regular">Add non-regular</string>
     <string name="enter_non_regular_description">Enter short description of expense:</string>
     <string name="cancel">Cancel</string>
+    <string name="enter_new_category_name">Enter new category name</string>
 
 
 </resources>

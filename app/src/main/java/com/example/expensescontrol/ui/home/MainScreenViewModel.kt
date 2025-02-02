@@ -16,42 +16,50 @@
 
 package com.example.expensescontrol.ui.home
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.stringResource
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.expensescontrol.R
 import com.example.expensescontrol.model.ExpensesUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.util.Date
-
 import com.example.expensescontrol.data.Item
 import com.example.expensescontrol.data.ItemsRepository
 import com.example.expensescontrol.ui.allexp.AllExpensesUiState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.char
 import network.chaintech.kmp_date_time_picker.utils.now
+import org.json.JSONArray
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
+import kotlinx.coroutines.withContext
+import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+
 
 /**
  * ViewModel to retrieve all items in the Room database.
  */
-class MainScreenViewModel(private val itemsRepository: ItemsRepository): ViewModel() {
+class MainScreenViewModel(
+    private val itemsRepository: ItemsRepository): ViewModel() {
+
+    var categoriesList = mutableListOf("")
 
     private val isAscending: Boolean = false // Change this as needed
 
@@ -83,6 +91,10 @@ class MainScreenViewModel(private val itemsRepository: ItemsRepository): ViewMod
     private val _mainUiState = MutableStateFlow(ExpensesUiState())
     val mainUiState: StateFlow<ExpensesUiState> = _mainUiState.asStateFlow()
 
+    fun populateRegularCategories(items: MutableList<String>){
+        categoriesList = items
+    }
+
     fun updateSelectedCat(newCat: String){
         if (newCat != "Add new category") {
             categorySelected = newCat
@@ -93,6 +105,10 @@ class MainScreenViewModel(private val itemsRepository: ItemsRepository): ViewMod
         }else{
             categorySelected = "adding new...."//initiate Add New Category actions
         }
+    }
+
+    fun addNewRegularCat(newCat: String){
+        categoriesList.add(newCat)
     }
 
     fun listSorted(items: List<Item>, isAscending: Boolean = false): List<Item>{

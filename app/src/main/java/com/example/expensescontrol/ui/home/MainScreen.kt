@@ -1,7 +1,5 @@
 package com.example.expensescontrol.ui.home
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableDefaults
@@ -20,14 +18,11 @@ import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,30 +33,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.expensescontrol.AllExpenses
 import com.example.expensescontrol.R
 import com.example.expensescontrol.data.Item
-import com.example.expensescontrol.model.Category
 import com.example.expensescontrol.ui.AppBottomBar
 import com.example.expensescontrol.ui.AppViewModelProvider
 import com.example.expensescontrol.ui.navigation.NavigationDestination
 import com.example.expensescontrol.ui.theme.ExpensesControlTheme
 import kotlinx.coroutines.launch
 import network.chaintech.kmp_date_time_picker.ui.datepicker.WheelDatePickerView
-import network.chaintech.kmp_date_time_picker.ui.datepicker.WheelPicker
 import network.chaintech.kmp_date_time_picker.utils.DateTimePickerView
 import network.chaintech.kmp_date_time_picker.utils.now
-import network.chaintech.kmp_date_time_picker.utils.shortDayOfWeek
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 
 
 object MainScreenDestination : NavigationDestination {
@@ -70,7 +60,6 @@ object MainScreenDestination : NavigationDestination {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen(
     navigateToSettingsScreen: () -> Unit,
@@ -81,10 +70,12 @@ fun MainScreen(
     viewModel: MainScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
 )
 {
+    val context = LocalContext.current
+    val jsonHandler = remember { JSonHandler(context) }
+    viewModel.populateRegularCategories(jsonHandler.categoriesList)
     val mainUiState by viewModel.mainScreenRepoUiState.collectAsState()
     val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
 
-    val layoutDirection = LocalLayoutDirection.current
     Scaffold (
         bottomBar = { AppBottomBar(
             config = "main",
@@ -102,6 +93,8 @@ fun MainScreen(
                     .padding(innerPadding)
             ) {
                 CategoryChooser(
+                    jsonHandler = jsonHandler,
+                    viewModel = viewModel,
                     onCategorySelected = {viewModel.updateSelectedCat(it)},
                     modifier
                 )
@@ -120,11 +113,13 @@ fun MainScreen(
 
 @Composable
 fun CategoryChooser(
+    jsonHandler: JSonHandler,
+    viewModel: MainScreenViewModel,
     onCategorySelected: (String) -> Unit,
     modifier: Modifier = Modifier) {
 
-    val c = Category()
-    val categories =  remember{c.cat}
+    val categories = viewModel.categoriesList
+    var isAddNewCategoryDialogVisible by remember { mutableStateOf(false) }
 
     LazyRow(
         state = rememberLazyListState(),
@@ -152,12 +147,81 @@ fun CategoryChooser(
                         shape = RoundedCornerShape(8.dp)
                     ) // Background color for each item
                     .padding(8.dp)// Inner padding within the background
-                    .clickable { onCategorySelected(category) },
-                style = MaterialTheme.typography.bodyLarge,
+                    .clickable {
+                        onCategorySelected(category)
+                        if (viewModel.categorySelected == "adding new....") {
+                            isAddNewCategoryDialogVisible = true
+                        } else {
 
+                        }
+                        onCategorySelected(category)
+                    },
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
+    }
+    if (isAddNewCategoryDialogVisible){
+        AddNewCategoryDialog(
+            jsonHandler = jsonHandler,
+            viewModel = viewModel,
+            onDismissRequest = {
+                onCategorySelected("")
+                isAddNewCategoryDialogVisible = false
+            }
+        )
+    }
+}
 
+@Composable
+fun AddNewCategoryDialog(
+    jsonHandler: JSonHandler,
+    viewModel: MainScreenViewModel,
+    onDismissRequest: () -> Unit
+) {
+    viewModel.updateSelectedCat("")
+    Dialog(
+        onDismissRequest = {}
+    ) {
+        Card(
+            modifier = Modifier
+                .padding(8.dp),
+        ) {
+            OutlinedTextField(
+                value = viewModel.categorySelected,
+                onValueChange = { viewModel.updateSelectedCat(it) },
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                label = { Text(stringResource(R.string.enter_new_category_name)) }
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(
+                    onClick = onDismissRequest
+                ) {
+                    Text(
+                        text = stringResource(R.string.cancel)
+                    )
+                }
+                Button(
+                    enabled = true,
+                    onClick = {
+                        viewModel.addNewRegularCat(viewModel.categorySelected)
+                        jsonHandler.updateCategories(viewModel.categoriesList)
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.submit)
+                    )
+                }
+            }
+
+        }
     }
 }
 
@@ -279,7 +343,6 @@ fun UserInputCard(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun PreviewMainScr(){

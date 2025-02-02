@@ -4,7 +4,9 @@ import androidx.compose.ui.res.stringResource
 import com.example.expensescontrol.R
 
 data class Category(val category: Int = 1){
-val cat =  mutableListOf(
+    var categories =  mutableListOf("")
+/*
+    val cat =  mutableListOf(
     "Grocery",
     "Fuel",
     "Cafes, restraurants",
@@ -24,8 +26,10 @@ val cat =  mutableListOf(
     "Presents",
     "Income",
     "Add new category")
+
+ */
     fun addCategory(newCat: String){
-        cat.add(newCat)
+    categories.add(newCat)
     }
 //    GROCERY(R.string.Grocery),
 //    FUEL(R.string.Fuel),
