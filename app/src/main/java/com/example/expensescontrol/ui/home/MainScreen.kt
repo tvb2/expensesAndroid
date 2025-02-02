@@ -167,6 +167,11 @@ fun CategoryChooser(
             onDismissRequest = {
                 onCategorySelected("")
                 isAddNewCategoryDialogVisible = false
+            },
+            onSubmitRequest = {
+                viewModel.addNewRegularCat(viewModel.categorySelected)
+                jsonHandler.updateCategories(viewModel.categoriesList)
+                isAddNewCategoryDialogVisible = false
             }
         )
     }
@@ -176,7 +181,8 @@ fun CategoryChooser(
 fun AddNewCategoryDialog(
     jsonHandler: JSonHandler,
     viewModel: MainScreenViewModel,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    onSubmitRequest: () -> Unit
 ) {
     viewModel.updateSelectedCat("")
     Dialog(
@@ -211,8 +217,7 @@ fun AddNewCategoryDialog(
                 Button(
                     enabled = true,
                     onClick = {
-                        viewModel.addNewRegularCat(viewModel.categorySelected)
-                        jsonHandler.updateCategories(viewModel.categoriesList)
+                        onSubmitRequest()
                     }
                 ) {
                     Text(

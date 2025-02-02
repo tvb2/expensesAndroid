@@ -59,9 +59,7 @@ import androidx.compose.ui.platform.LocalContext
 class MainScreenViewModel(
     private val itemsRepository: ItemsRepository): ViewModel() {
 
-    var categoriesList = mutableListOf("")
-
-    private val isAscending: Boolean = false // Change this as needed
+     private val isAscending: Boolean = false // Change this as needed
 
     val mainScreenRepoUiState: StateFlow<AllExpensesUiState> =
         itemsRepository.getAllItemsStream().map {items ->
@@ -78,6 +76,7 @@ class MainScreenViewModel(
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
+    var categoriesList = mutableListOf("")
     val currency = "CAD"
     val user = "tvb2"
     val rate: Double = 1.0
@@ -176,7 +175,7 @@ class MainScreenViewModel(
 
     fun validateSubmitInput(): Boolean {
         return (
-                _mainUiState.value.selectedCategory != "Nonsense" &&
+                categoriesList.contains(_mainUiState.value.selectedCategory) &&
                 _mainUiState.value.amount != 0.0
                 )
     }

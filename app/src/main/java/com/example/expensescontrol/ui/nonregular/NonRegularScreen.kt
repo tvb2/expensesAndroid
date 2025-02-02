@@ -44,7 +44,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.expensescontrol.AllExpenses
 import com.example.expensescontrol.R
 import com.example.expensescontrol.data.Item
-import com.example.expensescontrol.model.Category
 import com.example.expensescontrol.ui.AppBottomBar
 import com.example.expensescontrol.ui.AppViewModelProvider
 import com.example.expensescontrol.ui.home.MainScreenViewModel
