@@ -16,6 +16,7 @@
 
 package com.example.expensescontrol.data
 
+import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -46,4 +47,12 @@ interface ItemsRepository{
      * Update item in the data source
      */
     suspend fun updateItem(item: Item)
+
+    @Query("SELECT SUM(finalAmount) FROM items WHERE dateTimeModified >= :startDate AND " +
+            "regular = 1 AND category = :cat")
+    suspend fun categoryAverage(cat:String, startDate: String): Double
+
+    @Query("SELECT dateTimeModified FROM items ORDER BY dateTimeModified ASC LIMIT 1")
+    suspend fun startDateUpdate(): String
+
 }

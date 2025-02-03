@@ -21,7 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.expensescontrol.model.ExpensesUiState
+import com.example.expensescontrol.model.MainUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -76,8 +76,8 @@ class MainScreenViewModel(
     var amountInput by mutableStateOf("")
         private set
 
-    private val _mainUiState = MutableStateFlow(ExpensesUiState())
-    val mainUiState: StateFlow<ExpensesUiState> = _mainUiState.asStateFlow()
+    private val _mainUiState = MutableStateFlow(MainUiState())
+    val mainUiState: StateFlow<MainUiState> = _mainUiState.asStateFlow()
 
     fun populateRegularCategories(items: MutableList<String>){
         categoriesList = items
@@ -99,7 +99,7 @@ class MainScreenViewModel(
         categoriesList.add(newCat)
     }
 
-    fun listSorted(items: List<Item>, isAscending: Boolean = false): List<Item>{
+    private fun listSorted(items: List<Item>, isAscending: Boolean = false): List<Item>{
         // Sort items based on the desired column sortedByDescending or sortedBy for ascending order
         val sortedlist = if (isAscending) {
             items.sortedBy { it.dateTimeModified } // Change columnToSortBy to your desired column
@@ -193,10 +193,6 @@ class MainScreenViewModel(
 
     suspend fun addNewExpense(item: Item){
         itemsRepository.insertItem(item)
-    }
-
-    suspend fun deleteExpense(item: Item){
-        itemsRepository.deleteItem(item)
     }
 
     private fun validateInput(uiState: ItemDetails = itemUiState.itemDetails): Boolean {

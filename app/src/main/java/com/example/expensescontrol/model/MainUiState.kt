@@ -9,7 +9,7 @@ import network.chaintech.kmp_date_time_picker.utils.now
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
-data class ExpensesUiState(
+data class MainUiState(
     val selectedCategory: String = "Nonsense",
 
     val amount: Double = 0.0,

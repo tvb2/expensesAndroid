@@ -16,6 +16,7 @@
 
 package com.example.expensescontrol.data
 
+import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository{
@@ -28,4 +29,8 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository{
     override suspend fun deleteItem(item: Item) = itemDao.delete(item)
 
     override suspend fun updateItem(item: Item) = itemDao.update(item)
+
+    override suspend fun categoryAverage(cat:String, startDate: String): Double = itemDao.categoryAverage(cat, startDate)
+
+    override suspend fun startDateUpdate(): String = itemDao.startDateUpdate()
 }

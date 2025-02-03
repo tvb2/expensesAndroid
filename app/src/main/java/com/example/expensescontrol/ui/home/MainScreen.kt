@@ -46,6 +46,7 @@ import com.example.expensescontrol.data.Item
 import com.example.expensescontrol.ui.AppBottomBar
 import com.example.expensescontrol.ui.AppViewModelProvider
 import com.example.expensescontrol.ui.navigation.NavigationDestination
+import com.example.expensescontrol.ui.stats.StatisticsViewModel
 import com.example.expensescontrol.ui.theme.ExpensesControlTheme
 import kotlinx.coroutines.launch
 import network.chaintech.kmp_date_time_picker.ui.datepicker.WheelDatePickerView
@@ -67,13 +68,19 @@ fun MainScreen(
     navigateToAllExpsScreen: () -> Unit,
     navigateAddNonRegular: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MainScreenViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: MainScreenViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    statistics: StatisticsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 )
 {
+    //Read config data from JSON file
     val context = LocalContext.current
     val jsonHandler = remember { JSonHandler(context) }
     viewModel.populateRegularCategories(jsonHandler.categoriesList)
+    statistics.populateRegularCategories(jsonHandler.categoriesList)
+
+    //ViewModels for Main screen and for Statistics
     val mainUiState by viewModel.mainScreenRepoUiState.collectAsState()
+
     val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
 
     Scaffold (
@@ -95,11 +102,16 @@ fun MainScreen(
                 CategoryChooser(
                     jsonHandler = jsonHandler,
                     viewModel = viewModel,
-                    onCategorySelected = {viewModel.updateSelectedCat(it)},
+                    stats = statistics,
+                    onCategorySelected = {
+                        viewModel.updateSelectedCat(it)
+                        statistics.updateSelectedCat(it)
+                                         },
                     modifier
                 )
                 UserInputCard(
                     viewModel = viewModel,
+                    stats = statistics,
                     navigateAddNonRegular = navigateAddNonRegular,
                     modifier
                 )
@@ -115,11 +127,13 @@ fun MainScreen(
 fun CategoryChooser(
     jsonHandler: JSonHandler,
     viewModel: MainScreenViewModel,
+    stats: StatisticsViewModel,
     onCategorySelected: (String) -> Unit,
     modifier: Modifier = Modifier) {
 
     val categories = viewModel.categoriesList
     var isAddNewCategoryDialogVisible by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     LazyRow(
         state = rememberLazyListState(),
@@ -149,6 +163,10 @@ fun CategoryChooser(
                     .padding(8.dp)// Inner padding within the background
                     .clickable {
                         onCategorySelected(category)
+                        stats.updateSelectedCat(category)
+                        coroutineScope.launch {
+                            stats.categoryAverage()
+                        }
                         if (viewModel.categorySelected == "adding new....") {
                             isAddNewCategoryDialogVisible = true
                         } else {
@@ -233,9 +251,11 @@ fun AddNewCategoryDialog(
 @Composable
 fun UserInputCard(
     viewModel: MainScreenViewModel,
+    stats: StatisticsViewModel,
     navigateAddNonRegular: () -> Unit,
     modifier: Modifier = Modifier){
     val mainUiState by viewModel.mainUiState.collectAsState()
+    val statsUiState by stats.statsUiState.collectAsState()
     var checkedToday by remember { mutableStateOf(true) }
     var submitEnabled by remember { mutableStateOf(true) }
     Card(
@@ -261,7 +281,9 @@ fun UserInputCard(
             userModified = "tvb2"
         )
     Text(
-        text = "Category: " + viewModel.categorySelected,
+        text = "Category: " +
+                viewModel.categorySelected + " " +
+                statsUiState.selectedCategoryAvg,
         modifier = modifier.padding(start = 8.dp),
     )
     OutlinedTextField(

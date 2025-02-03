@@ -22,7 +22,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.expensescontrol.ui.home.MainScreen
+import com.example.expensescontrol.ui.stats.StatisticsViewModel
 import com.example.expensescontrol.ExpensesApplication
 import com.example.expensescontrol.ui.allexp.AllExpensesViewModel
 import com.example.expensescontrol.ui.home.MainScreenViewModel
@@ -43,12 +43,10 @@ object AppViewModelProvider {
 //            ItemEntryViewModel(inventoryApplication().container.itemsRepository)
 //        }
 
-        // Initializer for ItemDetailsViewModel
-//        initializer {
-//            ItemDetailsViewModel(
-//                this.createSavedStateHandle()
-//            )
-//        }
+        // Initializer for StatisticsViewModel
+        initializer {
+            StatisticsViewModel(expensesApplication().container.itemsRepository)
+        }
         // Initializer for AllExpensesViewModel
         initializer {
             AllExpensesViewModel(expensesApplication().container.itemsRepository)
