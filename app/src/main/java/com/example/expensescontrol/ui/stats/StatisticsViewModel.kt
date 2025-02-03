@@ -18,30 +18,27 @@ package com.example.expensescontrol.ui.stats
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.core.text.util.LocalePreferences.FirstDayOfWeek.Days
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.expensescontrol.model.MainUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import com.example.expensescontrol.data.Item
 import com.example.expensescontrol.data.ItemsRepository
 import com.example.expensescontrol.model.StatisticsUiState
 import com.example.expensescontrol.ui.allexp.AllExpensesUiState
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.format
-import kotlinx.datetime.format.MonthNames
-import kotlinx.datetime.format.char
+import java.time.Duration
+import java.time.LocalDate
+
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
+import java.time.Period
 
 class StatisticsViewModel(
     private val itemsRepository: ItemsRepository): ViewModel() {
@@ -68,7 +65,9 @@ class StatisticsViewModel(
 
     private var categorySelected by mutableStateOf("")
 
-    private lateinit var startDate: String
+    private var startDate: String? = LocalDate.now().toString()
+    private var days: Int = 1
+    private var months: Double = 1.0
 
     private val _statsUiState = MutableStateFlow(StatisticsUiState())
     val statsUiState: StateFlow<StatisticsUiState> = _statsUiState.asStateFlow()
@@ -97,14 +96,29 @@ class StatisticsViewModel(
             )
         }
     }
-    suspend fun startDateUpdate(){
-        startDate = itemsRepository.startDateUpdate()
+    private suspend fun startDateUpdate(){
+        val sDate = itemsRepository.startDateUpdate()
+        startDate = if(sDate.isNullOrBlank())
+            startDate
+        else
+            sDate
     }
+
     suspend fun categoryAverage(){
-       val average =  itemsRepository.categoryAverage(categorySelected,startDate)
+        val average=  (itemsRepository.categoryTotal(categorySelected,startDate)/months)
         _statsUiState.update { selectedCatUiState ->
             selectedCatUiState.copy(
-                selectedCategoryAvg = average
+                selectedCategoryAvg = average.toInt()
             )}
+//            )}       val durationDays: Double = Period.between(
+//            startDateTime.toLocalDate(),
+//            OffsetDateTime.now().toLocalDate())
+//            .days.toDouble()
+//       val months: Double = durationDays/30
+//        val average: Int =  (itemsRepository.categoryTotal(categorySelected,startDate)/months).toInt()
+//        _statsUiState.update { selectedCatUiState ->
+//            selectedCatUiState.copy(
+//                selectedCategoryAvg = average
+//            )}
     }
 }

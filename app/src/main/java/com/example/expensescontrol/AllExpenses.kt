@@ -40,11 +40,13 @@ import com.example.expensescontrol.ui.theme.ExpensesControlTheme
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
+import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.char
+import network.chaintech.kmp_date_time_picker.ui.date_range_picker.parseToLocalDate
 import network.chaintech.kmp_date_time_picker.utils.now
 import java.time.format.DateTimeFormatter
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AllExpenses(
     itemList: List<Item>,
@@ -123,6 +125,11 @@ fun ExpenseRecordView(
      record: Item,
      viewModel: AllExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory),
      modifier: Modifier = Modifier){
+     val createdDate = record.dateCreated.parseToLocalDate()
+     val customFormat = LocalDate.Format {
+         monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); dayOfMonth(); chars(", "); year()
+     }
+     val expenseDate: String = createdDate.format(customFormat)
      var menuIsVisible by remember { mutableStateOf(false) }
    Row(modifier = Modifier
            .combinedClickable(
@@ -158,7 +165,7 @@ fun ExpenseRecordView(
            horizontalAlignment = Alignment.End
        ) {
            Text(
-               text = record.dateCreated
+               text = expenseDate
            )
        }
        PreviousItemDropdownMenu(

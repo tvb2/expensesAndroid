@@ -16,7 +16,9 @@ data class MainUiState(
 
     val finalAmount: Double = 0.0,
 
-    val dateCreated: String = LocalDate.now()
+    val dateCreated: LocalDate = LocalDate.now(),
+
+    val dateDisplayed: String = LocalDate.now()
         .format(
             LocalDate.Format {
                 monthName(MonthNames.ENGLISH_ABBREVIATED);

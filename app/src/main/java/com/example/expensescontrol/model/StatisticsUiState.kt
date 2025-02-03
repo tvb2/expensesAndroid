@@ -12,7 +12,7 @@ import java.time.OffsetDateTime
 data class StatisticsUiState(
     val selectedCategory: String = "Nonsense",
 
-    val selectedCategoryAvg: Double = 0.0,
+    val selectedCategoryAvg: Int = 0,
 
     val selectedCategoryTotalThisPeriod: Double = 0.0,
 

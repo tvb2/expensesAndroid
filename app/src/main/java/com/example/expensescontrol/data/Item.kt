@@ -18,6 +18,7 @@ package com.example.expensescontrol.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.datetime.LocalDate
 
 
 /**

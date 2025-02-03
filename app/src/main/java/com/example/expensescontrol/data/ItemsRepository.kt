@@ -50,9 +50,9 @@ interface ItemsRepository{
 
     @Query("SELECT SUM(finalAmount) FROM items WHERE dateTimeModified >= :startDate AND " +
             "regular = 1 AND category = :cat")
-    suspend fun categoryAverage(cat:String, startDate: String): Double
+    suspend fun categoryTotal(cat:String, startDate: String?): Double
 
-    @Query("SELECT dateTimeModified FROM items ORDER BY dateTimeModified ASC LIMIT 1")
+    @Query("SELECT dateCreated FROM items ORDER BY dateCreated ASC LIMIT 1")
     suspend fun startDateUpdate(): String
 
 }

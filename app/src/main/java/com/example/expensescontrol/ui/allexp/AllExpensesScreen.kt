@@ -86,7 +86,6 @@ fun AllExp(modifier: Modifier = Modifier){
 
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun PreviewMainScr(){

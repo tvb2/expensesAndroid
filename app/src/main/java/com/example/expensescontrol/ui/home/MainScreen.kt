@@ -105,7 +105,6 @@ fun MainScreen(
                     stats = statistics,
                     onCategorySelected = {
                         viewModel.updateSelectedCat(it)
-                        statistics.updateSelectedCat(it)
                                          },
                     modifier
                 )
@@ -162,7 +161,7 @@ fun CategoryChooser(
                     ) // Background color for each item
                     .padding(8.dp)// Inner padding within the background
                     .clickable {
-                        onCategorySelected(category)
+                        viewModel.updateSelectedCat(category)
                         stats.updateSelectedCat(category)
                         coroutineScope.launch {
                             stats.categoryAverage()
@@ -269,7 +268,7 @@ fun UserInputCard(
 
         val item = Item(
 //            id = 1,
-            dateCreated = mainUiState.dateCreated,
+            dateCreated = mainUiState.dateCreated.toString(),
             dateTimeModified = mainUiState.dateTimeModified,
             category = mainUiState.selectedCategory,
             amount = mainUiState.amount,
@@ -283,7 +282,8 @@ fun UserInputCard(
     Text(
         text = "Category: " +
                 viewModel.categorySelected + " " +
-                statsUiState.selectedCategoryAvg,
+                statsUiState.selectedCategoryAvg +
+                "/month",
         modifier = modifier.padding(start = 8.dp),
     )
     OutlinedTextField(

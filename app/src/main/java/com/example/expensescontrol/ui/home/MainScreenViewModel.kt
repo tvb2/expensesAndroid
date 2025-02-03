@@ -125,26 +125,17 @@ class MainScreenViewModel(
 }
 
     fun onCheckedTodayChecked(){
-        val currentDate = LocalDate.now()
-        val customFormat = LocalDate.Format {
-            monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); dayOfMonth(); chars(", "); year()
-        }
-        val date: String = currentDate.format(customFormat)
         _mainUiState.update { createdDateUiState ->
             createdDateUiState.copy(
-                dateCreated = date
+                dateCreated = LocalDate.now()
             )
         }
     }
 
     fun onCreatedDateChange(newDate: LocalDate){
-        val customFormat = LocalDate.Format {
-            monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); dayOfMonth(); chars(", "); year()
-        }
-        val date: String = newDate.format(customFormat)
         _mainUiState.update { createdDateUiState ->
             createdDateUiState.copy(
-                dateCreated = date
+                dateCreated = newDate
             )
         }
     }
@@ -212,7 +203,7 @@ data class ItemUiState(
 
 data class ItemDetails(
     val id: Int = 0,
-    val dateCreated: String = "Jan 31, 2024",//MMM dd, yyyy
+    val dateCreated: String = LocalDate.now().toString(),
     val dateTimeModified: String = "Jan 31, 2024",
     val category: String = "Grocery",
     val amount: Double = 1.01,

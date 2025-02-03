@@ -49,7 +49,6 @@ object NonRegularScreenDestination : NavigationDestination {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NonRegularScreen(
     modifier: Modifier = Modifier,
@@ -96,7 +95,7 @@ fun UserInputCard(
         submitEnabled = viewModel.validateNonRegularSubmitInput()
 
         val item = Item(
-            dateCreated = mainUiState.dateCreated,
+            dateCreated = mainUiState.dateCreated.toString(),
             dateTimeModified = mainUiState.dateTimeModified,
             category = viewModel.categorySelected,
             amount = mainUiState.amount,

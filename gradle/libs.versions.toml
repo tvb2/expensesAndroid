@@ -17,6 +17,7 @@ roomCommon = "2.6.1"
 roomCompiler = "2.6.1"
 roomKtx = "2.6.1"
 junitJunit = "4.12"
+protoliteWellKnownTypes = "18.0.0"
 
 [libraries]
 androidx-compose-bom-v20241201 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
@@ -47,6 +48,7 @@ ui = { module = "androidx.compose.ui:ui" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
+protolite-well-known-types = { group = "com.google.firebase", name = "protolite-well-known-types", version.ref = "protoliteWellKnownTypes" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
