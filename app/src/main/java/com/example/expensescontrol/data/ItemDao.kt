@@ -26,11 +26,13 @@ interface ItemDao {
     @Query("SELECT * from items ORDER BY dateCreated ASC")
     fun getAllItems(): Flow<List<Item>>
 
-    @Query("SELECT SUM(finalAmount) FROM items WHERE dateCreated >= :startDate AND " +
-            "regular = 1 AND category = :cat")
-    suspend fun categoryTotal(cat:String, startDate: String?): Double
+    @Query("SELECT SUM(finalAmount) FROM items WHERE category = :cat")
+    suspend fun categoryTotal(cat:String): Double
 
     @Query("SELECT dateCreated FROM items ORDER BY dateCreated ASC LIMIT 1")
     suspend fun startDateUpdate(): String
+
+    @Query("Select SUM(finalAmount) FROM items WHERE dateCreated >= :date")
+    suspend fun currentPeriodTotal(date: String): Double
 
 }

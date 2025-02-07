@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -267,25 +268,33 @@ fun UserInputCard(
         submitEnabled = viewModel.validateRegularSubmitInput()
 
         val item = Item(
-//            id = 1,
             dateCreated = mainUiState.dateCreated.toString(),
             dateTimeModified = mainUiState.dateTimeModified,
             category = mainUiState.selectedCategory,
             amount = mainUiState.amount,
-            currency = "CAD",
-            exchRate = 1.0,
+            currency = mainUiState.currency,
+            exchRate = mainUiState.exchRate,
             finalAmount = mainUiState.finalAmount,
-            regular = true,
-            userCreated = "tvb2",
-            userModified = "tvb2"
+            regular = mainUiState.regular,
+            userCreated = mainUiState.userCreated,
+            userModified = mainUiState.userModified
         )
-    Text(
-        text = "Category: " +
-                viewModel.categorySelected + " " +
-                statsUiState.selectedCategoryAvg +
-                "/month",
-        modifier = modifier.padding(start = 8.dp),
-    )
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Text(
+            text = "Category: " +
+                    viewModel.categorySelected + " " +
+                    statsUiState.selectedCategoryAvg +
+                    "/month",
+            modifier = modifier.padding(start = 8.dp),
+        )
+        Text(
+            text = "This month total: " +
+                    statsUiState.totalThisPeriod
+        )
+    }
     OutlinedTextField(
         value = viewModel.amountInput,
         onValueChange = {viewModel.updateInputAmount(it)},
@@ -357,11 +366,15 @@ fun UserInputCard(
         onClick = {
             viewModel.updateDateTimeModified()
             coroutineScope.launch {
-            viewModel.addNewExpense(item)
-            viewModel.updateInputAmount("")
-            viewModel.updateSelectedCat("Select category")
-            checkedToday = true
-        } }
+                viewModel.addNewExpense(item)
+                viewModel.updateInputAmount("")
+                viewModel.updateSelectedCat("Select category")
+                checkedToday = true
+                stats.startDateUpdate()
+                stats.clearCatAverage()
+                stats.periodTotal()
+            }
+        }
     ) {
         Text(
             text = stringResource(R.string.submit)

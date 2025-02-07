@@ -19,6 +19,7 @@ data class StatisticsUiState(
     val selectedCategoryTotal: Double = 0.0,
 
     val totalThisPeriod: Double = 0.0,
+    val averageThisPeriod: Double = 0.0,
 
     val startDateTime: String =
         OffsetDateTime

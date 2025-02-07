@@ -33,9 +33,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.format
-import kotlinx.datetime.format.MonthNames
-import kotlinx.datetime.format.char
 import network.chaintech.kmp_date_time_picker.utils.now
 import java.text.NumberFormat
 import java.time.LocalDateTime

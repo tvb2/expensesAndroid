@@ -196,10 +196,6 @@ fun PreviousItemDropdownMenu(
             onDismissRequest = toggleVisibility
         ) {
             DropdownMenuItem(
-                text = { Text("Option 1") },
-                onClick = { /* Do something... */ }
-            )
-            DropdownMenuItem(
                 text = { Text("Delete item") },
                 onClick = {
                     coroutineScope.launch {
@@ -212,7 +208,6 @@ fun PreviousItemDropdownMenu(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun PreviewPreviousExpenses(){

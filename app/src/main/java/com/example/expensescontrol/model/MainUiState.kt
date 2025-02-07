@@ -1,5 +1,6 @@
 package com.example.expensescontrol.model
 
+import android.icu.util.Currency
 import com.example.expensescontrol.data.Item
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
@@ -9,6 +10,7 @@ import network.chaintech.kmp_date_time_picker.utils.now
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
+
 data class MainUiState(
     val selectedCategory: String = "Nonsense",
 
@@ -17,6 +19,16 @@ data class MainUiState(
     val finalAmount: Double = 0.0,
 
     val dateCreated: LocalDate = LocalDate.now(),
+
+    val currency: String  = "CAD",
+
+    val exchRate: Double = 1.0,
+
+    val userCreated: String = "tvb2",
+
+    val userModified: String = "tvb2",
+
+    val regular: Boolean = true,
 
     val dateDisplayed: String = LocalDate.now()
         .format(

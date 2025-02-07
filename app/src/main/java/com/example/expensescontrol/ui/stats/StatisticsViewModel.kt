@@ -19,7 +19,7 @@ package com.example.expensescontrol.ui.stats
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.text.util.LocalePreferences.FirstDayOfWeek.Days
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,12 +33,17 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.time.Duration
-import java.time.LocalDate
+
+import kotlinx.datetime.daysUntil
+
+import network.chaintech.kmp_date_time_picker.ui.date_range_picker.parseToLocalDate
+
+import kotlinx.datetime.LocalDate
+import network.chaintech.kmp_date_time_picker.utils.now
 
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
-import java.time.Period
+
 
 class StatisticsViewModel(
     private val itemsRepository: ItemsRepository): ViewModel() {
@@ -46,6 +51,8 @@ class StatisticsViewModel(
         init{
             viewModelScope.launch {
                 startDateUpdate()
+                startOfPeriodUpdate()
+                periodTotal()
             }
     }
     val statisticsRepoUiState: StateFlow<AllExpensesUiState> =
@@ -65,7 +72,8 @@ class StatisticsViewModel(
 
     private var categorySelected by mutableStateOf("")
 
-    private var startDate: String? = LocalDate.now().toString()
+    private var startDate: String = LocalDate.now().toString()
+    private var startOfPeriod: String = LocalDate.now().toString()
     private var days: Int = 1
     private var months: Double = 1.0
 
@@ -96,29 +104,47 @@ class StatisticsViewModel(
             )
         }
     }
-    private suspend fun startDateUpdate(){
+
+    suspend fun startDateUpdate(){
         val sDate = itemsRepository.startDateUpdate()
         startDate = if(sDate.isNullOrBlank())
             startDate
         else
             sDate
+
+        val start = startDate.parseToLocalDate("yyyy-MM-dd")
+        val today = LocalDate.now()
+        val numberOfDays = (start.daysUntil(today) + 1).toDouble()
+        months = numberOfDays/(365/12)
+    }
+
+    private fun startOfPeriodUpdate(){
+        val month = LocalDate.now().month
+        val year = LocalDate.now().year
+        startOfPeriod = LocalDate(year, month, 1).toString()
     }
 
     suspend fun categoryAverage(){
-        val average=  (itemsRepository.categoryTotal(categorySelected,startDate)/months)
+        val average=  (itemsRepository.categoryTotal(categorySelected)/months)
         _statsUiState.update { selectedCatUiState ->
             selectedCatUiState.copy(
                 selectedCategoryAvg = average.toInt()
             )}
-//            )}       val durationDays: Double = Period.between(
-//            startDateTime.toLocalDate(),
-//            OffsetDateTime.now().toLocalDate())
-//            .days.toDouble()
-//       val months: Double = durationDays/30
-//        val average: Int =  (itemsRepository.categoryTotal(categorySelected,startDate)/months).toInt()
-//        _statsUiState.update { selectedCatUiState ->
-//            selectedCatUiState.copy(
-//                selectedCategoryAvg = average
-//            )}
+    }
+
+    suspend fun periodTotal(){
+        val periodTotal = (itemsRepository.currentPeriodTotal(startOfPeriod))
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                totalThisPeriod = periodTotal
+            )}
+    }
+
+    fun clearCatAverage(){
+        val average = 0
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                selectedCategoryAvg = average
+            )}
     }
 }
