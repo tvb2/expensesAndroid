@@ -1,14 +1,10 @@
 package com.example.expensescontrol.ui.stats
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -31,8 +27,8 @@ import com.example.expensescontrol.ui.AppBottomBar
 import com.example.expensescontrol.ui.AppViewModelProvider
 import com.example.expensescontrol.ui.home.JSonHandler
 import com.example.expensescontrol.ui.home.MainScreenDestination
-import com.example.expensescontrol.ui.home.MainScreenViewModel
 import com.example.expensescontrol.ui.navigation.NavigationDestination
+import java.util.Locale
 
 object StatsDestination : NavigationDestination {
     override val route = "stats"
@@ -83,11 +79,11 @@ fun StatsScreen(
                 text = "This period")
             //This period
             Stats(
-                regular = statsUiState.regularThisPeriod,
-                nonregular = statsUiState.nonRegularThisPeriod,
-                total = statsUiState.totalThisPeriod,
-                income = statsUiState.incomeThisPeriod,
-                balance = statsUiState.balanceThisPeriod,
+                regular = statsUiState.thisPeriodRegular,
+                nonregular = statsUiState.thisPeriodNonRegular,
+                total = statsUiState.thisPeriodTotal,
+                income = statsUiState.thisPeriodIncome,
+                balance = statsUiState.thisPeriodBalance,
                 stats = statistics,
                 modifier
             )
@@ -99,7 +95,7 @@ fun StatsScreen(
                 nonregular = statsUiState.averageNonRegular,
                 total = statsUiState.total,
                 income = statsUiState.averageIncome,
-                balance = statsUiState.balanceTotal,
+                balance = statsUiState.totalBalance,
                 stats = statistics,
                 modifier
             )
@@ -143,7 +139,7 @@ fun Stats(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = regular.toString()
+                    text = String.format(Locale("Canada"),"%.2f", regular)
                 )
             }
         }
@@ -167,7 +163,7 @@ fun Stats(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = nonregular.toString()
+                    text = String.format(Locale("Canada"),"%.2f", nonregular)
                 )
             }
         }
@@ -191,7 +187,7 @@ fun Stats(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = total.toString()
+                    text = String.format(Locale("Canada"),"%.2f", total)
                 )
             }
         }
@@ -215,7 +211,7 @@ fun Stats(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = income.toString()
+                    text = String.format(Locale("Canada"),"%.2f", income)
                 )
             }
         }
@@ -239,7 +235,7 @@ fun Stats(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = balance.toString()
+                    text = String.format(Locale("Canada"),"%.2f", balance)
                 )
             }
         }

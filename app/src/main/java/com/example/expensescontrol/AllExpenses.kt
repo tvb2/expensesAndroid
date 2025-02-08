@@ -21,6 +21,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +37,7 @@ import com.example.expensescontrol.data.Item
 import com.example.expensescontrol.ui.AppViewModelProvider
 import com.example.expensescontrol.ui.allexp.AllExpensesViewModel
 import com.example.expensescontrol.ui.home.MainScreenViewModel
+import com.example.expensescontrol.ui.stats.StatisticsViewModel
 import com.example.expensescontrol.ui.theme.ExpensesControlTheme
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
@@ -124,6 +126,7 @@ fun ExpenseRecordView(
      itemClicked: () -> Unit,
      record: Item,
      viewModel: AllExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory),
+     stats: StatisticsViewModel = viewModel(factory = AppViewModelProvider.Factory),
      modifier: Modifier = Modifier){
      val createdDate = record.dateCreated.parseToLocalDate()
      val customFormat = LocalDate.Format {
@@ -172,6 +175,7 @@ fun ExpenseRecordView(
            item = record,
            menuIsVisible = menuIsVisible,
            toggleVisibility = {menuIsVisible = false},
+           statistics = stats,
            viewModel = viewModel
        )
        }
@@ -181,6 +185,7 @@ fun ExpenseRecordView(
 fun PreviousItemDropdownMenu(
     menuIsVisible: Boolean,
     viewModel: AllExpensesViewModel,
+    statistics: StatisticsViewModel,
     toggleVisibility: () -> Unit,
     item: Item,
 ) {
@@ -200,6 +205,7 @@ fun PreviousItemDropdownMenu(
                 onClick = {
                     coroutineScope.launch {
                         viewModel.deleteExpense(item)
+                        statistics.updateStatistics()
                     }
                     toggleVisibility()
                 }

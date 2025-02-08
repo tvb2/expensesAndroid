@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -281,7 +280,7 @@ fun UserInputCard(
         )
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        horizontalArrangement = Arrangement.Start
     ) {
         Text(
             text = "Category: " +
@@ -290,11 +289,18 @@ fun UserInputCard(
                     "/month",
             modifier = modifier.padding(start = 8.dp),
         )
-        Text(
-            text = "This month total: " +
-                    statsUiState.totalThisPeriod
-        )
     }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                text = "This month total: " +
+                        statsUiState.thisPeriodTotal,
+                modifier = modifier.padding(start = 8.dp),
+
+            )
+        }
     OutlinedTextField(
         value = viewModel.amountInput,
         onValueChange = {viewModel.updateInputAmount(it)},
@@ -370,9 +376,7 @@ fun UserInputCard(
                 viewModel.updateInputAmount("")
                 viewModel.updateSelectedCat("Select category")
                 checkedToday = true
-                stats.startDateUpdate()
-                stats.clearCatAverage()
-                stats.periodTotal()
+                stats.updateStatistics()
             }
         }
     ) {

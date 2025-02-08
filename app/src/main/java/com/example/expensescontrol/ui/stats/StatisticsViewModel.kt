@@ -156,7 +156,7 @@ class StatisticsViewModel(
     fun averageNonRegular(){
         _statsUiState.update { selectedCatUiState ->
             selectedCatUiState.copy(
-                averageNonRegular = statsUiState.value.nonRegularTotal/months
+                averageNonRegular = statsUiState.value.totalNonRegular/months
             )}
     }
 
@@ -171,7 +171,7 @@ class StatisticsViewModel(
         val periodTotal = (itemsRepository.currentPeriodTotal(startOfPeriod))
         _statsUiState.update { selectedCatUiState ->
             selectedCatUiState.copy(
-                totalThisPeriod = periodTotal
+                thisPeriodTotal = periodTotal
             )}
     }
 
@@ -203,7 +203,7 @@ class StatisticsViewModel(
         val periodRegular = (itemsRepository.currentPeriodRegular(startOfPeriod))
         _statsUiState.update { selectedCatUiState ->
             selectedCatUiState.copy(
-                regularThisPeriod = periodRegular
+                thisPeriodRegular = periodRegular
             )}
     }
 
@@ -211,14 +211,14 @@ class StatisticsViewModel(
         val periodIncome = (itemsRepository.currentPeriodIncome(startOfPeriod))
         _statsUiState.update { selectedCatUiState ->
             selectedCatUiState.copy(
-                incomeThisPeriod = periodIncome
+                thisPeriodIncome = periodIncome
             )}
     }
 
     fun totalBalance(){
         _statsUiState.update { selectedCatUiState ->
             selectedCatUiState.copy(
-                balanceTotal =
+                totalBalance =
                 statsUiState.value.totalIncome -
                         statsUiState.value.total
             )}
@@ -227,7 +227,7 @@ class StatisticsViewModel(
     fun totalNonRegular(){
         _statsUiState.update { selectedCatUiState ->
             selectedCatUiState.copy(
-                nonRegularTotal =
+                totalNonRegular =
                 statsUiState.value.total -
                         statsUiState.value.totalRegular
             )}
@@ -236,18 +236,18 @@ class StatisticsViewModel(
     fun periodBalance(){
         _statsUiState.update { selectedCatUiState ->
             selectedCatUiState.copy(
-                balanceThisPeriod =
-                statsUiState.value.incomeThisPeriod -
-                statsUiState.value.totalThisPeriod
+                thisPeriodBalance =
+                statsUiState.value.thisPeriodIncome -
+                statsUiState.value.thisPeriodTotal
             )}
     }
 
     fun periodNonRegular(){
         _statsUiState.update { selectedCatUiState ->
             selectedCatUiState.copy(
-                 nonRegularThisPeriod =
-                    statsUiState.value.totalThisPeriod -
-                    statsUiState.value.regularThisPeriod
+                 thisPeriodNonRegular =
+                    statsUiState.value.thisPeriodTotal -
+                    statsUiState.value.thisPeriodRegular
             )}
     }
 
@@ -258,5 +258,28 @@ class StatisticsViewModel(
             selectedCatUiState.copy(
                 selectedCategoryAvg = average
             )}
+    }
+
+    fun updateStatistics(){
+        viewModelScope.launch {
+            startDateUpdate()
+            startOfPeriodUpdate()
+            total()
+            totalRegular()
+            totalIncome()
+            totalNonRegular()
+            totalBalance()
+
+            periodTotal()
+            periodRegular()
+            periodNonRegular()
+            periodIncome()
+            periodBalance()
+
+            averageRegular()
+            averageNonRegular()
+            averageIncome()
+            clearCatAverage()
+        }
     }
 }
