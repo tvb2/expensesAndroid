@@ -52,11 +52,21 @@ class StatisticsViewModel(
             viewModelScope.launch {
                 startDateUpdate()
                 startOfPeriodUpdate()
+                total()
+                totalRegular()
+                totalIncome()
+                totalNonRegular()
+                totalBalance()
+
                 periodTotal()
                 periodRegular()
                 periodNonRegular()
                 periodIncome()
                 periodBalance()
+
+                averageRegular()
+                averageNonRegular()
+                averageIncome()
             }
     }
     val statisticsRepoUiState: StateFlow<AllExpensesUiState> =
@@ -136,11 +146,56 @@ class StatisticsViewModel(
             )}
     }
 
+    fun averageRegular(){
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                averageRegular = statsUiState.value.totalRegular/months
+            )}
+    }
+
+    fun averageNonRegular(){
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                averageNonRegular = statsUiState.value.nonRegularTotal/months
+            )}
+    }
+
+    fun averageIncome(){
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                averageIncome = statsUiState.value.totalIncome/months
+            )}
+    }
+
     suspend fun periodTotal(){
         val periodTotal = (itemsRepository.currentPeriodTotal(startOfPeriod))
         _statsUiState.update { selectedCatUiState ->
             selectedCatUiState.copy(
                 totalThisPeriod = periodTotal
+            )}
+    }
+
+    suspend fun total(){
+        val total = (itemsRepository.total())
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                total = total
+            )}
+    }
+
+    suspend fun totalRegular(){
+        val totalRegular = (itemsRepository.totalRegular())
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                totalRegular = totalRegular
+            )}
+    }
+
+    suspend fun totalIncome(){
+        val totalIncome = (itemsRepository.totalIncome())
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                totalIncome = totalIncome
             )}
     }
 
@@ -157,6 +212,24 @@ class StatisticsViewModel(
         _statsUiState.update { selectedCatUiState ->
             selectedCatUiState.copy(
                 incomeThisPeriod = periodIncome
+            )}
+    }
+
+    fun totalBalance(){
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                balanceTotal =
+                statsUiState.value.totalIncome -
+                        statsUiState.value.total
+            )}
+    }
+
+    fun totalNonRegular(){
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                nonRegularTotal =
+                statsUiState.value.total -
+                        statsUiState.value.totalRegular
             )}
     }
 

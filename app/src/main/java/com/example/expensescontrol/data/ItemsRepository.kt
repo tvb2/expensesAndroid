@@ -48,6 +48,15 @@ interface ItemsRepository{
      */
     suspend fun updateItem(item: Item)
 
+    @Query("SELECT SUM(finalAmount) FROM items WHERE category != 'Income' ")
+    suspend fun total(): Double
+
+    @Query("SELECT SUM(finalAmount) FROM items WHERE regular = 1 AND category != 'Income' ")
+    suspend fun totalRegular(): Double
+
+    @Query("Select SUM(finalAmount) FROM items WHERE category = 'Income' ")
+    suspend fun totalIncome(): Double
+
     @Query("SELECT SUM(finalAmount) FROM items WHERE category = :cat")
     suspend fun categoryTotal(cat:String): Double
 

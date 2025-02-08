@@ -40,7 +40,6 @@ object StatsDestination : NavigationDestination {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun StatsScreen(
     navigateToMainScreen: () -> Unit,
@@ -57,7 +56,8 @@ fun StatsScreen(
     val context = LocalContext.current
     val jsonHandler = remember { JSonHandler(context) }
     statistics.populateRegularCategories(jsonHandler.categoriesList)
-
+    //ViewModels for Main screen and for Statistics
+    val statsUiState by statistics.statsUiState.collectAsState()
     Scaffold(
         bottomBar = {
             AppBottomBar(
@@ -71,14 +71,35 @@ fun StatsScreen(
                 modifier = Modifier
             )
         }
-    ){innerPadding ->
+    ){
+        innerPadding ->
         Column(
             modifier = modifier
                 .padding(innerPadding)
                 .fillMaxWidth()
         )
         {
+            Text(modifier = Modifier.padding(top = 16.dp),
+                text = "This period")
+            //This period
             Stats(
+                regular = statsUiState.regularThisPeriod,
+                nonregular = statsUiState.nonRegularThisPeriod,
+                total = statsUiState.totalThisPeriod,
+                income = statsUiState.incomeThisPeriod,
+                balance = statsUiState.balanceThisPeriod,
+                stats = statistics,
+                modifier
+            )
+            Text(modifier = Modifier.padding(top = 16.dp),
+                text = "Total/Average")
+            //Total/Average
+            Stats(
+                regular = statsUiState.averageRegular,
+                nonregular = statsUiState.averageNonRegular,
+                total = statsUiState.total,
+                income = statsUiState.averageIncome,
+                balance = statsUiState.balanceTotal,
                 stats = statistics,
                 modifier
             )
@@ -88,15 +109,20 @@ fun StatsScreen(
 
 @Composable
 fun Stats(
+    regular: Double,
+    nonregular: Double,
+    total: Double,
+    income: Double,
+    balance: Double,
     stats: StatisticsViewModel,
-    modifier: Modifier = Modifier){
+    modifier: Modifier = Modifier
+        .padding(top = 20.dp)){
     Column(modifier = modifier
         .padding(
             top = 16.dp,
             start = 8.dp,
             end = 20.dp)) {
-        //ViewModels for Main screen and for Statistics
-        val statsUiState by stats.statsUiState.collectAsState()
+
     //Regular Total
         Row(
             modifier = modifier
@@ -109,7 +135,7 @@ fun Stats(
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = "Regular total"
+                    text = "Regular"
                 )
             }
             Column (modifier = modifier
@@ -117,7 +143,7 @@ fun Stats(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = statsUiState.regularThisPeriod.toString()
+                    text = regular.toString()
                 )
             }
         }
@@ -133,7 +159,7 @@ fun Stats(
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = "Non Regular total"
+                    text = "Non Regular"
                 )
             }
             Column (modifier = modifier
@@ -141,7 +167,7 @@ fun Stats(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text =statsUiState.nonRegularThisPeriod.toString()
+                    text = nonregular.toString()
                 )
             }
         }
@@ -165,7 +191,7 @@ fun Stats(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = statsUiState.totalThisPeriod.toString()
+                    text = total.toString()
                 )
             }
         }
@@ -189,7 +215,7 @@ fun Stats(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = statsUiState.incomeThisPeriod.toString()
+                    text = income.toString()
                 )
             }
         }
@@ -213,7 +239,7 @@ fun Stats(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = statsUiState.balanceThisPeriod.toString()
+                    text = balance.toString()
                 )
             }
         }

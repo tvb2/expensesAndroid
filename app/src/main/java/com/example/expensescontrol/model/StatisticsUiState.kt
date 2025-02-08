@@ -19,9 +19,17 @@ data class StatisticsUiState(
     val selectedCategoryTotal: Double = 0.0,
 
     val totalThisPeriod: Double = 0.0,
+    val total: Double = 0.0,
+    val totalRegular: Double = 0.0,
+    val totalIncome: Double = 0.0,
+    val nonRegularTotal: Double = 0.0,
+    val balanceTotal: Double = 0.0,
     val regularThisPeriod: Double = 0.0,
     val nonRegularThisPeriod: Double = 0.0,
     val averageThisPeriod: Double = 0.0,
+    val averageRegular: Double = 0.0,
+    val averageNonRegular: Double = 0.0,
+    val averageIncome: Double = 0.0,
     val incomeThisPeriod: Double = 0.0,
     val balanceThisPeriod: Double = 0.0,
 
