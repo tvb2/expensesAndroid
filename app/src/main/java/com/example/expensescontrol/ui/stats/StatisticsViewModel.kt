@@ -53,6 +53,10 @@ class StatisticsViewModel(
                 startDateUpdate()
                 startOfPeriodUpdate()
                 periodTotal()
+                periodRegular()
+                periodNonRegular()
+                periodIncome()
+                periodBalance()
             }
     }
     val statisticsRepoUiState: StateFlow<AllExpensesUiState> =
@@ -139,6 +143,41 @@ class StatisticsViewModel(
                 totalThisPeriod = periodTotal
             )}
     }
+
+    suspend fun periodRegular(){
+        val periodRegular = (itemsRepository.currentPeriodRegular(startOfPeriod))
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                regularThisPeriod = periodRegular
+            )}
+    }
+
+    suspend fun periodIncome(){
+        val periodIncome = (itemsRepository.currentPeriodIncome(startOfPeriod))
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                incomeThisPeriod = periodIncome
+            )}
+    }
+
+    fun periodBalance(){
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                balanceThisPeriod =
+                statsUiState.value.incomeThisPeriod -
+                statsUiState.value.totalThisPeriod
+            )}
+    }
+
+    fun periodNonRegular(){
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                 nonRegularThisPeriod =
+                    statsUiState.value.totalThisPeriod -
+                    statsUiState.value.regularThisPeriod
+            )}
+    }
+
 
     fun clearCatAverage(){
         val average = 0

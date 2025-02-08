@@ -3,7 +3,9 @@ package com.example.expensescontrol.ui.stats
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,16 +14,24 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.expensescontrol.ui.theme.ExpensesControlTheme
 import com.example.expensescontrol.R
 import com.example.expensescontrol.ui.AppBottomBar
+import com.example.expensescontrol.ui.AppViewModelProvider
+import com.example.expensescontrol.ui.home.JSonHandler
 import com.example.expensescontrol.ui.home.MainScreenDestination
+import com.example.expensescontrol.ui.home.MainScreenViewModel
 import com.example.expensescontrol.ui.navigation.NavigationDestination
 
 object StatsDestination : NavigationDestination {
@@ -36,11 +46,17 @@ fun StatsScreen(
     navigateToMainScreen: () -> Unit,
     navigateToSettingsScreen: () -> Unit,
     navigateToAllExpsScreen: () -> Unit,
+    statistics: StatisticsViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier
 )
 {
     val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
     val layoutDirection = LocalLayoutDirection.current
+
+    //Read config data from JSON file
+    val context = LocalContext.current
+    val jsonHandler = remember { JSonHandler(context) }
+    statistics.populateRegularCategories(jsonHandler.categoriesList)
 
     Scaffold(
         bottomBar = {
@@ -62,31 +78,151 @@ fun StatsScreen(
                 .fillMaxWidth()
         )
         {
-            Stats(modifier)
+            Stats(
+                stats = statistics,
+                modifier
+            )
         }
     }
 }
 
 @Composable
-fun Stats(modifier: Modifier = Modifier){
-    Column {
-        Text(
-            text = stringResource(R.string.stats),
-            modifier = Modifier
-                .padding(2.dp)       // Add padding around each item
-                .background(
-                    Color.LightGray,
-                    shape = RoundedCornerShape(8.dp)
-                ) // Background color for each item
-                .padding(8.dp)// Inner padding within the background
-            )
+fun Stats(
+    stats: StatisticsViewModel,
+    modifier: Modifier = Modifier){
+    Column(modifier = modifier
+        .padding(
+            top = 16.dp,
+            start = 8.dp,
+            end = 20.dp)) {
+        //ViewModels for Main screen and for Statistics
+        val statsUiState by stats.statsUiState.collectAsState()
+    //Regular Total
+        Row(
+            modifier = modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Column(modifier = modifier
+                .weight(1F),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "Regular total"
+                )
+            }
+            Column (modifier = modifier
+                .weight(1F),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = statsUiState.regularThisPeriod.toString()
+                )
+            }
+        }
+    //Non-Regular Total
+        Row(
+            modifier = modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Column(modifier = modifier
+                .weight(1F),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "Non Regular total"
+                )
+            }
+            Column (modifier = modifier
+                .weight(1F),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text =statsUiState.nonRegularThisPeriod.toString()
+                )
+            }
+        }
+    //Total
+        Row(
+            modifier = modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Column(modifier = modifier
+                .weight(1F),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "Total expenses"
+                )
+            }
+            Column (modifier = modifier
+                .weight(1F),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = statsUiState.totalThisPeriod.toString()
+                )
+            }
+        }
+    //Income
+        Row(
+            modifier = modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Column(modifier = modifier
+                .weight(1F),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "Income"
+                )
+            }
+            Column (modifier = modifier
+                .weight(1F),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = statsUiState.incomeThisPeriod.toString()
+                )
+            }
+        }
+    //Balance
+        Row(
+            modifier = modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Column(modifier = modifier
+                .weight(1F),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "Balance"
+                )
+            }
+            Column (modifier = modifier
+                .weight(1F),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = statsUiState.balanceThisPeriod.toString()
+                )
+            }
+        }
     }
 
 }
 
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun PreviewMainScr(){

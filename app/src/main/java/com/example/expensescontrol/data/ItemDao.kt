@@ -32,7 +32,17 @@ interface ItemDao {
     @Query("SELECT dateCreated FROM items ORDER BY dateCreated ASC LIMIT 1")
     suspend fun startDateUpdate(): String
 
-    @Query("Select SUM(finalAmount) FROM items WHERE dateCreated >= :date")
+    @Query("Select SUM(finalAmount) FROM items WHERE dateCreated >= :date AND " +
+            "category != 'Income' ")
     suspend fun currentPeriodTotal(date: String): Double
+
+    @Query("Select SUM(finalAmount) FROM items WHERE dateCreated >= :date AND " +
+            "category != 'Income' AND " +
+            "regular = 1")
+    suspend fun currentPeriodRegular(date: String): Double
+
+    @Query("Select SUM(finalAmount) FROM items WHERE dateCreated >= :date AND " +
+            "category = 'Income' ")
+    suspend fun currentPeriodIncome(date: String): Double
 
 }

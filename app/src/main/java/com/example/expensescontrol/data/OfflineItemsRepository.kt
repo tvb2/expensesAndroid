@@ -35,4 +35,9 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository{
     override suspend fun startDateUpdate(): String = itemDao.startDateUpdate()
 
     override suspend fun currentPeriodTotal(date: String): Double = itemDao.currentPeriodTotal(date)
+
+    override suspend fun currentPeriodRegular(date: String): Double = itemDao.currentPeriodRegular(date)
+
+    override suspend fun currentPeriodIncome(date: String): Double = itemDao.currentPeriodIncome(date)
+
 }

@@ -19,7 +19,11 @@ data class StatisticsUiState(
     val selectedCategoryTotal: Double = 0.0,
 
     val totalThisPeriod: Double = 0.0,
+    val regularThisPeriod: Double = 0.0,
+    val nonRegularThisPeriod: Double = 0.0,
     val averageThisPeriod: Double = 0.0,
+    val incomeThisPeriod: Double = 0.0,
+    val balanceThisPeriod: Double = 0.0,
 
     val startDateTime: String =
         OffsetDateTime
