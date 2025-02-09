@@ -1,5 +1,6 @@
 package com.example.expensescontrol.model
 
+import com.example.expensescontrol.ui.stats.CategoryStats
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
@@ -38,5 +39,5 @@ data class StatisticsUiState(
     val selectedCategoryAvg: Int = 0,
     val selectedCategoryTotal: Double = 0.0,
     val selectedCategoryTotalThisPeriod: Double = 0.0,
-
-    )
+    val categoryStats: List<CategoryStats> = listOf()
+)

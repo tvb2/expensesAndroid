@@ -49,25 +49,7 @@ class StatisticsViewModel(
     private val itemsRepository: ItemsRepository): ViewModel() {
 
         init{
-            viewModelScope.launch {
-                startDateUpdate()
-                startOfPeriodUpdate()
-                total()
-                totalRegular()
-                totalIncome()
-                totalNonRegular()
-                totalBalance()
-
-                periodTotal()
-                periodRegular()
-                periodNonRegular()
-                periodIncome()
-                periodBalance()
-
-                averageRegular()
-                averageNonRegular()
-                averageIncome()
-            }
+            updateStatistics()
     }
     val statisticsRepoUiState: StateFlow<AllExpensesUiState> =
         itemsRepository.getAllItemsStream().map {items ->
@@ -88,7 +70,6 @@ class StatisticsViewModel(
 
     private var startDate: String = LocalDate.now().toString()
     private var startOfPeriod: String = LocalDate.now().toString()
-    private var days: Int = 1
     private var months: Double = 1.0
 
     private val _statsUiState = MutableStateFlow(StatisticsUiState())
@@ -96,6 +77,27 @@ class StatisticsViewModel(
 
     fun populateRegularCategories(items: MutableList<String>){
         categoriesList = items
+    }
+
+    private suspend fun updateCategoryStats(){
+        val categoryStats: MutableMap<String, CategoryStats> = mutableMapOf(Pair("Grocery",
+            CategoryStats()))
+
+        for (category in categoriesList) {
+            val catStat = CategoryStats()
+            val total: Double = itemsRepository.categoryTotal(category)
+            catStat.catTotal = total //itemsRepository.categoryTotal(category)
+            catStat.category = category
+            catStat.catAverage = catStat.catTotal / months
+            catStat.catNPeriodsAverage = catStat.catAverage //To be implemented yet
+            catStat.catPerCentIncome = 100*catStat.catAverage / statsUiState.value.averageIncome
+            categoryStats[category] = catStat
+        }
+        val temp = categoryStats.values.toList()
+            _statsUiState.update { selectedCatUiState ->
+                selectedCatUiState.copy(
+                    categoryStats = temp
+                )}
     }
 
     fun updateSelectedCat(newCat: String){
@@ -279,6 +281,7 @@ class StatisticsViewModel(
             averageRegular()
             averageNonRegular()
             averageIncome()
+            updateCategoryStats()
             clearCatAverage()
         }
     }

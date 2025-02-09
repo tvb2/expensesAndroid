@@ -1,11 +1,16 @@
 package com.example.expensescontrol.ui.stats
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -16,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,6 +32,7 @@ import com.example.expensescontrol.ui.AppViewModelProvider
 import com.example.expensescontrol.ui.home.JSonHandler
 import com.example.expensescontrol.ui.home.MainScreenDestination
 import com.example.expensescontrol.ui.navigation.NavigationDestination
+
 import java.util.Locale
 
 object StatsDestination : NavigationDestination {
@@ -46,7 +51,6 @@ fun StatsScreen(
 )
 {
     val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
-    val layoutDirection = LocalLayoutDirection.current
 
     //Read config data from JSON file
     val context = LocalContext.current
@@ -84,7 +88,6 @@ fun StatsScreen(
                 total = statsUiState.thisPeriodTotal,
                 income = statsUiState.thisPeriodIncome,
                 balance = statsUiState.thisPeriodBalance,
-                stats = statistics,
                 modifier
             )
             Text(modifier = Modifier.padding(top = 16.dp),
@@ -96,9 +99,14 @@ fun StatsScreen(
                 total = statsUiState.total,
                 income = statsUiState.averageIncome,
                 balance = statsUiState.totalBalance,
-                stats = statistics,
                 modifier
             )
+            CategoryStatisticsHeader()
+            CategoryStatisticsView(
+                statsUiState.categoryStats,
+                modifier = modifier
+            )
+
         }
     }
 }
@@ -110,7 +118,6 @@ fun Stats(
     total: Double,
     income: Double,
     balance: Double,
-    stats: StatisticsViewModel,
     modifier: Modifier = Modifier
         .padding(top = 20.dp)){
     Column(modifier = modifier
@@ -243,6 +250,122 @@ fun Stats(
 
 }
 
+@Composable
+fun CategoryStatisticsHeader(
+    modifier: Modifier = Modifier){
+    Row(modifier = Modifier
+        .padding(
+            start = 10.dp,
+            end = 10.dp
+        )
+        .fillMaxWidth()
+        .height(60.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    )
+    {
+//Category name
+        Text(
+            text = stringResource(R.string.category),
+        )
+//Cat total
+        Text(
+            text = "Total"
+        )
+//Cat per period
+        Text(
+            text = "Monthly average"
+        )
+//Cat per smaller period
+        Text(
+            text = "3 mo avg"
+        )
+//Cat per income %
+        Text(
+            text = "Income %"
+        )
+    }
+}
+
+@Composable
+fun CategoryStatisticsView(
+    itemList: List<CategoryStats>,
+    modifier: Modifier) {
+
+    Card(modifier = Modifier) {
+        Column(modifier = Modifier.fillMaxWidth())
+        {
+            LazyColumn(modifier = modifier){
+                items(itemList) { oldExpenses ->
+                    CategoryStatisticsCard(
+                        oldExpenses
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CategoryStatisticsCard(
+    item: CategoryStats,
+    modifier: Modifier = Modifier){
+    Row(modifier = Modifier
+        .padding(
+            top = 16.dp,
+            bottom = 16.dp
+        )
+        .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+//Category name
+        Column(
+            modifier
+                .weight(1F), horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                text =  item.category
+            )
+        }
+//Cat total
+        Column(modifier = modifier
+            .weight(1F),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text =  String.format(Locale("Canada"),"%.0f",item.catTotal),
+            )
+        }
+//Cat average
+        Column (modifier = modifier
+            .weight(1F),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = String.format(Locale("Canada"),"%.1f",item.catAverage)
+            )
+        }
+//Cat smaller periods average
+        Column(
+            modifier
+                .weight(1F), horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = String.format(Locale("Canada"),"%.1f",item.catNPeriodsAverage)
+            )
+        }
+//Cat per income %
+        Column(
+            modifier
+                .weight(1F), horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = String.format(Locale("Canada"),"%.1f",item.catPerCentIncome)
+            )
+        }
+    }
+}
 
 
 @Preview
