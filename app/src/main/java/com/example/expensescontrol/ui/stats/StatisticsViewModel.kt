@@ -93,10 +93,12 @@ class StatisticsViewModel(
             catStat.catPerCentIncome = 100*catStat.catAverage / statsUiState.value.averageIncome
             categoryStats[category] = catStat
         }
-        val temp = categoryStats.values.toList()
-            _statsUiState.update { selectedCatUiState ->
-                selectedCatUiState.copy(
-                    categoryStats = temp
+        categoryStats.remove("Income")
+        categoryStats.remove("Add new category")
+            val temp = categoryStats.values.toList()
+                _statsUiState.update { selectedCatUiState ->
+                    selectedCatUiState.copy(
+                        categoryStats = temp
                 )}
     }
 

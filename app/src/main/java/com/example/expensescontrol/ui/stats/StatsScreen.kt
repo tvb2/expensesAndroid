@@ -1,6 +1,6 @@
 package com.example.expensescontrol.ui.stats
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +17,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -58,6 +60,9 @@ fun StatsScreen(
     statistics.populateRegularCategories(jsonHandler.categoriesList)
     //ViewModels for Main screen and for Statistics
     val statsUiState by statistics.statsUiState.collectAsState()
+    var visibleThisPeriod by remember  {mutableStateOf(true)}
+    var visibleAverage by remember  {mutableStateOf(false)}
+    var visibleTotal by remember  {mutableStateOf(false)}
     Scaffold(
         bottomBar = {
             AppBottomBar(
@@ -79,28 +84,61 @@ fun StatsScreen(
                 .fillMaxWidth()
         )
         {
-            Text(modifier = Modifier.padding(top = 16.dp),
+            Text(modifier = Modifier
+                .padding(top = 16.dp)
+                .clickable {
+                    visibleThisPeriod = !visibleThisPeriod
+                }
+                ,
                 text = "This period")
             //This period
-            Stats(
-                regular = statsUiState.thisPeriodRegular,
-                nonregular = statsUiState.thisPeriodNonRegular,
-                total = statsUiState.thisPeriodTotal,
-                income = statsUiState.thisPeriodIncome,
-                balance = statsUiState.thisPeriodBalance,
-                modifier
-            )
-            Text(modifier = Modifier.padding(top = 16.dp),
-                text = "Total/Average")
-            //Total/Average
-            Stats(
-                regular = statsUiState.averageRegular,
-                nonregular = statsUiState.averageNonRegular,
-                total = statsUiState.total,
-                income = statsUiState.averageIncome,
-                balance = statsUiState.totalBalance,
-                modifier
-            )
+            if (visibleThisPeriod) {
+                Stats(
+                    regular = statsUiState.thisPeriodRegular,
+                    nonregular = statsUiState.thisPeriodNonRegular,
+                    total = statsUiState.thisPeriodTotal,
+                    income = statsUiState.thisPeriodIncome,
+                    balance = statsUiState.thisPeriodBalance,
+                    switch = "Period",
+                    modifier
+                )
+            }
+            Text(modifier = Modifier
+                .padding(top = 16.dp)
+                .clickable {
+                    visibleAverage = !visibleAverage
+                },
+                text = "Average")
+            //Average
+            if (visibleAverage) {
+                Stats(
+                    regular = statsUiState.averageRegular,
+                    nonregular = statsUiState.averageNonRegular,
+                    total = statsUiState.total,//not used in this context
+                    income = statsUiState.averageIncome,
+                    balance = statsUiState.totalBalance,//not used in this context
+                    switch = "Average",
+                    modifier
+                )
+            }
+            Text(modifier = Modifier
+                .padding(top = 16.dp)
+                .clickable {
+                    visibleTotal = !visibleTotal
+                },
+                text = "Total")
+            //Total
+            if (visibleTotal) {
+                Stats(
+                    regular = statsUiState.totalRegular,//not used in this context
+                    nonregular = statsUiState.averageNonRegular,//not used in this context
+                    total = statsUiState.total,
+                    income = statsUiState.totalIncome,
+                    balance = statsUiState.totalBalance,
+                    switch = "Total",
+                    modifier
+                )
+            }
             CategoryStatisticsHeader()
             CategoryStatisticsView(
                 statsUiState.categoryStats,
@@ -118,6 +156,7 @@ fun Stats(
     total: Double,
     income: Double,
     balance: Double,
+    switch: String,
     modifier: Modifier = Modifier
         .padding(top = 20.dp)){
     Column(modifier = modifier
@@ -126,124 +165,142 @@ fun Stats(
             start = 8.dp,
             end = 20.dp)) {
 
-    //Regular Total
-        Row(
-            modifier = modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Column(modifier = modifier
-                .weight(1F),
-                horizontalAlignment = Alignment.Start
+        //Regular
+        if (switch != "Total") {
+            Row(
+                modifier = modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text(
-                    text = "Regular"
-                )
-            }
-            Column (modifier = modifier
-                .weight(1F),
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    text = String.format(Locale("Canada"),"%.2f", regular)
-                )
-            }
-        }
-    //Non-Regular Total
-        Row(
-            modifier = modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Column(modifier = modifier
-                .weight(1F),
-                horizontalAlignment = Alignment.Start
-            ) {
-                Text(
-                    text = "Non Regular"
-                )
-            }
-            Column (modifier = modifier
-                .weight(1F),
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    text = String.format(Locale("Canada"),"%.2f", nonregular)
-                )
+                Column(
+                    modifier = modifier
+                        .weight(1F),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = "Regular"
+                    )
+                }
+                Column(
+                    modifier = modifier
+                        .weight(1F),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = regular.toInt().toString()//String.format(Locale("Canada"), "%.2f", regular)
+                    )
+                }
             }
         }
-    //Total
-        Row(
-            modifier = modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Column(modifier = modifier
-                .weight(1F),
-                horizontalAlignment = Alignment.Start
+        //Non-Regular
+        if (switch != "Total") {
+            Row(
+                modifier = modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text(
-                    text = "Total expenses"
-                )
-            }
-            Column (modifier = modifier
-                .weight(1F),
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    text = String.format(Locale("Canada"),"%.2f", total)
-                )
+                Column(
+                    modifier = modifier
+                        .weight(1F),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = "Non Regular"
+                    )
+                }
+                Column(
+                    modifier = modifier
+                        .weight(1F),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = nonregular.toInt().toString()//String.format(Locale("Canada"), "%.2f", nonregular)
+                    )
+                }
             }
         }
-    //Income
+        //Total
+        if (switch != "Average") {
+            Row(
+                modifier = modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Column(
+                    modifier = modifier
+                        .weight(1F),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = "Total expenses"
+                    )
+                }
+                Column(
+                    modifier = modifier
+                        .weight(1F),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = total.toInt().toString()// String.format(Locale("Canada"), "%.2f", total)
+                    )
+                }
+            }
+        }
+        //Income
         Row(
             modifier = modifier
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Column(modifier = modifier
-                .weight(1F),
+            Column(
+                modifier = modifier
+                    .weight(1F),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
                     text = "Income"
                 )
             }
-            Column (modifier = modifier
-                .weight(1F),
+            Column(
+                modifier = modifier
+                    .weight(1F),
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = String.format(Locale("Canada"),"%.2f", income)
+                    text =  income.toInt().toString()//String.format(Locale("Canada"), "%.2f", income)
                 )
             }
         }
-    //Balance
-        Row(
-            modifier = modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Column(modifier = modifier
-                .weight(1F),
-                horizontalAlignment = Alignment.Start
+        //Balance
+        if (switch != "Average") {
+            Row(
+                modifier = modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text(
-                    text = "Balance"
-                )
-            }
-            Column (modifier = modifier
-                .weight(1F),
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    text = String.format(Locale("Canada"),"%.2f", balance)
-                )
+                Column(
+                    modifier = modifier
+                        .weight(1F),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = "Balance"
+                    )
+                }
+                Column(
+                    modifier = modifier
+                        .weight(1F),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text =  balance.toInt().toString()// String.format(Locale("Canada"), "%.2f", balance)
+                    )
+                }
             }
         }
     }
@@ -343,7 +400,7 @@ fun CategoryStatisticsCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = String.format(Locale("Canada"),"%.1f",item.catAverage)
+                text = item.catAverage.toInt().toString() //String.format(Locale("Canada"),"%.1f",item.catAverage)
             )
         }
 //Cat smaller periods average
@@ -352,7 +409,7 @@ fun CategoryStatisticsCard(
                 .weight(1F), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = String.format(Locale("Canada"),"%.1f",item.catNPeriodsAverage)
+                text = item.catNPeriodsAverage.toInt().toString() // String.format(Locale("Canada"),"%.1f",item.catNPeriodsAverage)
             )
         }
 //Cat per income %
@@ -361,7 +418,7 @@ fun CategoryStatisticsCard(
                 .weight(1F), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = String.format(Locale("Canada"),"%.1f",item.catPerCentIncome)
+                text = String.format(Locale("Canada"),"%.1f%%",item.catPerCentIncome)
             )
         }
     }

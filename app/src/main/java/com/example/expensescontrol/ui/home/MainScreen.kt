@@ -285,7 +285,8 @@ fun UserInputCard(
         Text(
             text = "Category: " +
                     viewModel.categorySelected + " " +
-                    statsUiState.selectedCategoryAvg +
+                    statsUiState.selectedCategoryAvg + " " +
+                    mainUiState.currency +
                     "/month",
             modifier = modifier.padding(start = 8.dp),
         )
@@ -296,7 +297,8 @@ fun UserInputCard(
         ) {
             Text(
                 text = "This month total: " +
-                        statsUiState.thisPeriodTotal,
+                        statsUiState.thisPeriodTotal.toInt() + " " +
+                mainUiState.currency,
                 modifier = modifier.padding(start = 8.dp),
 
             )

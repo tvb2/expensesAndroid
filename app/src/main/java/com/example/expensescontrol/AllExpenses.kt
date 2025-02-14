@@ -86,7 +86,6 @@ fun AllExpensesHeader(
         horizontalArrangement = Arrangement.SpaceBetween
     )
     {
-
         Text(
             text = stringResource(R.string.category),
         )
