@@ -1,21 +1,28 @@
-[
-  "Grocery",
-  "Fuel",
-  "Cafes, restraurants",
-  "Entertainment",
-  "Public transport",
-  "Communications",
-  "Utilities",
-  "Kids education/development",
-  "Alcohol",
-  "Car maintenance",
-  "House maintenance",
-  "Insurances",
-  "Medical",
-  "Hygiene",
-  "Detergents",
-  "Clothes",
-  "Presents",
-  "Income",
-  "Add new category"
-]
+{
+  "account": {
+    "username": "user1",
+    "connectionString": "default"
+  },
+  "categories": [
+    "Grocery",
+    "Fuel",
+    "Cafes",
+    "Entertainment",
+    "Public transport",
+    "Communications",
+    "Utilities",
+    "Kids",
+    "Alcohol",
+    "Car maintenance",
+    "House repairs",
+    "Insurances",
+    "Medical",
+    "Hygiene",
+    "House maintenance",
+    "Clothes",
+    "Presents",
+    "Income",
+    "Business",
+    "Add new category"
+  ]
+}

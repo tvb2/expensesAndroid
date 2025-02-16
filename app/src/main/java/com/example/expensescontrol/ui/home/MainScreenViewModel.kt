@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.expensescontrol.data.Account
 import com.example.expensescontrol.model.MainUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -63,9 +64,11 @@ class MainScreenViewModel(
     }
 
     var categoriesList = mutableListOf("")
-    val currency = "CAD"
-    val user = "tvb2"
-    val rate: Double = 1.0
+
+    var account by mutableStateOf(Account("", ""))
+        private set
+
+    private val rate: Double = 1.0
 
     var categorySelected by mutableStateOf("")
         private set
@@ -162,6 +165,38 @@ class MainScreenViewModel(
                 _mainUiState.value.selectedCategory.isNotEmpty() &&
                         _mainUiState.value.amount != 0.0
                 )
+    }
+
+    fun isAccountSetUp(account: Account): Boolean{
+        return (account.username != "user1" && account.connectionString != "default")
+    }
+
+    fun validateAccountInputData(): Boolean{
+        return(
+                mainUiState.value.userName.isNotBlank() &&
+                mainUiState.value.connectionString.isNotBlank()
+                )
+    }
+
+    fun updateUserName(user: String) {
+        this.account = this.account.copy(
+            if (user.length <= 4) user
+        else user.subSequence(0, 3).toString()
+        )
+        _mainUiState.update { userUiState ->
+            userUiState.copy(
+                userName = this.account.username
+            )
+        }
+    }
+
+    fun updateConnectionString(connection: String) {
+        this.account = this.account.copy(connectionString = connection)
+        _mainUiState.update { connectionUiState ->
+            connectionUiState.copy(
+                connectionString = account.connectionString
+            )
+        }
     }
 
     /**

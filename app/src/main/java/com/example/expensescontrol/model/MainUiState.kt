@@ -1,6 +1,7 @@
 package com.example.expensescontrol.model
 
 import android.icu.util.Currency
+import com.example.expensescontrol.data.Account
 import com.example.expensescontrol.data.Item
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.format
@@ -27,6 +28,12 @@ data class MainUiState(
     val userCreated: String = "tvb2",
 
     val userModified: String = "tvb2",
+
+//    val userAccount: Account = Account("", ""),
+
+    val userName: String = "",
+
+    val connectionString: String = "",
 
     val regular: Boolean = true,
 

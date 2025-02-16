@@ -30,7 +30,6 @@ object AllExpensesDestination : NavigationDestination {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AllExpensesScreen(
     navigateToMainScreen: () -> Unit,

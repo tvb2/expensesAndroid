@@ -43,6 +43,11 @@
     <string name="enter_non_regular_description">Enter short description of expense:</string>
     <string name="cancel">Cancel</string>
     <string name="enter_new_category_name">Enter new category name</string>
+    <string name="title_fmt">Title FMT</string>
+    <string name="key1_action">Key1 action</string>
+    <string name="key1_summary">Key1 summary</string>
+    <string name="enter_username">Enter username (4 characters)</string>
+    <string name="enter_connection_string">Enter Connection String</string>
 
 
 </resources>

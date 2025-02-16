@@ -75,10 +75,12 @@ fun MainScreen(
     //Read config data from JSON file
     val context = LocalContext.current
     val jsonHandler = remember { JSonHandler(context) }
-    viewModel.populateRegularCategories(jsonHandler.categoriesList)
-    statistics.populateRegularCategories(jsonHandler.categoriesList)
+    viewModel.populateRegularCategories(jsonHandler.data.categories)
+    statistics.populateRegularCategories(jsonHandler.data.categories)
+    var isAccountInfoComplete by remember { mutableStateOf(false) }
+    isAccountInfoComplete = viewModel.isAccountSetUp(jsonHandler.data.account)
 
-    //ViewModels for Main screen and for Statistics
+    //UiState for Main screen and for Statistics
     val mainUiState by viewModel.mainScreenRepoUiState.collectAsState()
 
     val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
@@ -99,6 +101,16 @@ fun MainScreen(
                 modifier = modifier
                     .padding(innerPadding)
             ) {
+                if (!isAccountInfoComplete){
+                    AddNewAccountDialog(
+                        viewModel = viewModel,
+                        onDismissRequest = {},
+                        onSubmitRequest = {
+                            isAccountInfoComplete = true
+                            jsonHandler.updateAccount(viewModel.account)
+                        }
+                    )
+                }
                 CategoryChooser(
                     jsonHandler = jsonHandler,
                     viewModel = viewModel,
@@ -386,6 +398,62 @@ fun UserInputCard(
             text = stringResource(R.string.submit)
         )
     }
+    }
+}
+
+@Composable
+fun AddNewAccountDialog(
+    viewModel: MainScreenViewModel,
+    onDismissRequest: () -> Unit,
+    onSubmitRequest: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = {}
+    ) {
+        Card(
+            modifier = Modifier
+                .padding(8.dp),
+        ) {
+            //Username
+            OutlinedTextField(
+                value = viewModel.account.username,
+                onValueChange = {viewModel.updateUserName(it)},
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                label = {Text(stringResource(R.string.enter_username))}
+            )
+            //ConnectionString
+            OutlinedTextField(
+                    value = viewModel.account.connectionString,
+                    onValueChange = { viewModel.updateConnectionString(it) },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    label = {Text(stringResource(R.string.enter_connection_string))}
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(
+                    enabled = viewModel.validateAccountInputData(),
+                    onClick = {
+                        onSubmitRequest()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.submit)
+                    )
+                }
+            }
+
+        }
     }
 }
 
