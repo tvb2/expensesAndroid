@@ -1,6 +1,7 @@
 package com.example.expensescontrol.data
 
 import android.content.ContentProvider
+import android.content.ContentProviderClient
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri

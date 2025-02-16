@@ -79,6 +79,7 @@ fun MainScreen(
     statistics.populateRegularCategories(jsonHandler.data.categories)
     var isAccountInfoComplete by remember { mutableStateOf(false) }
     isAccountInfoComplete = viewModel.isAccountSetUp(jsonHandler.data.account)
+    viewModel.sync(context)
 
     //UiState for Main screen and for Statistics
     val mainUiState by viewModel.mainScreenRepoUiState.collectAsState()

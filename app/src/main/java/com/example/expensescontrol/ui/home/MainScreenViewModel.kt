@@ -16,9 +16,16 @@
 
 package com.example.expensescontrol.ui.home
 
+import android.content.ContentProvider
+import android.content.ContentProviderClient
+import android.content.ContentResolver
+import android.content.Context
+import android.content.SyncResult
+import android.os.Bundle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.expensescontrol.data.Account
@@ -29,6 +36,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import com.example.expensescontrol.data.Item
 import com.example.expensescontrol.data.ItemsRepository
+import com.example.expensescontrol.data.StubContentResolver
+import com.example.expensescontrol.data.StubProvider
+import com.example.expensescontrol.syncadapter.SyncAdapter
 import com.example.expensescontrol.ui.allexp.AllExpensesUiState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -79,6 +89,15 @@ class MainScreenViewModel(
     private val _mainUiState = MutableStateFlow(MainUiState())
     val mainUiState: StateFlow<MainUiState> = _mainUiState.asStateFlow()
 
+    fun sync(context: Context){
+        val syncS: SyncAdapter = SyncAdapter(
+            context = context,
+            autoInitialize = true,
+            allowParallelSyncs = false,
+        )
+        syncS.sync()
+    }
+    
     fun populateRegularCategories(items: MutableList<String>){
         categoriesList = items
     }

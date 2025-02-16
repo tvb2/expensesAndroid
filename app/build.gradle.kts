@@ -63,6 +63,8 @@ dependencies {
     implementation(libs.kmp.date.time.picker)
     implementation(libs.protolite.well.known.types)
     implementation (libs.kotlinx.serialization.json) // Check for the latest version
+    implementation (libs.retrofit2.retrofit)
+    implementation (libs.squareup.converter.gson)
     implementation(project(mapOf("path" to ":sqlitecloud")))
     testImplementation(libs.junit.junit)
     ksp(libs.androidx.room.compiler)
