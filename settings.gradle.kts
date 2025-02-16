@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ExpensesControl"
 include(":app")
- 
+include(":sqlitecloud")
