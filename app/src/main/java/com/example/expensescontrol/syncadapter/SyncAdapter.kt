@@ -51,7 +51,7 @@ class SyncAdapter @JvmOverloads constructor(
         provider: ContentProviderClient?,
         syncResult: SyncResult?
     ) {
-        val configuration = SQLiteCloudConfig.fromString("sqlitecloud://cscb9azvnz.g1.sqlite.cloud:8860/chinook.sqlite?apikey=Kz0iFfcTDWMrIbbucMLPjVBJ0LLoLKY4k5or0kX0JAk")
+        val configuration = SQLiteCloudConfig.fromString("sqlitecloud://cscb9azvnz.g1.sqlite.cloud:8860/expenses?apikey=Kz0iFfcTDWMrIbbucMLPjVBJ0LLoLKY4k5or0kX0JAk")
 
         val sqliteCloud = SQLiteCloud(appContext = context, config = configuration)
 
