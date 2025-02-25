@@ -16,16 +16,15 @@
 
 package com.example.expensescontrol.ui.home
 
-import android.content.ContentProvider
-import android.content.ContentProviderClient
-import android.content.ContentResolver
+
 import android.content.Context
-import android.content.SyncResult
-import android.os.Bundle
+
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.key.type
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.expensescontrol.data.Account
@@ -36,18 +35,33 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import com.example.expensescontrol.data.Item
 import com.example.expensescontrol.data.ItemsRepository
-import com.example.expensescontrol.data.StubContentResolver
-import com.example.expensescontrol.data.StubProvider
-import com.example.expensescontrol.syncadapter.SyncAdapter
+
 import com.example.expensescontrol.ui.allexp.AllExpensesUiState
+
+import io.sqlitecloud.ProgressHandler
+import io.sqlitecloud.SQLiteCloud
+import io.sqlitecloud.SQLiteCloudChannel
+import io.sqlitecloud.SQLiteCloudConfig
+import io.sqlitecloud.SQLiteCloudError
+import io.sqlitecloud.SQLiteCloudResult
+import io.sqlitecloud.SQLiteCloudValue
+
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import network.chaintech.kmp_date_time_picker.utils.now
+
+import java.nio.file.Path
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
+import kotlin.text.toDoubleOrNull
+import kotlin.text.toIntOrNull
 
 
 /**
@@ -89,15 +103,103 @@ class MainScreenViewModel(
     private val _mainUiState = MutableStateFlow(MainUiState())
     val mainUiState: StateFlow<MainUiState> = _mainUiState.asStateFlow()
 
-    fun sync(context: Context){
-        val syncS: SyncAdapter = SyncAdapter(
-            context = context,
-            autoInitialize = true,
-            allowParallelSyncs = false,
-        )
-        syncS.sync()
+    // Function to convert SQLiteCloudValue to a Kotlin value
+    fun SQLiteCloudValue.toKotlinValue(): Any? {
+        return when (this) {
+            is SQLiteCloudValue.Integer -> this.value.toInt()
+            is SQLiteCloudValue.Double -> this.value
+            is SQLiteCloudValue.String -> this.value
+            is SQLiteCloudValue.Blob -> this.stringValue
+            is SQLiteCloudValue.Null -> null
+            else -> this.stringValue
+        }
     }
-    
+
+    fun selectLatest(context: Context) {
+        val configuration = SQLiteCloudConfig.fromString(mainUiState.value.connectionString)
+        val sqLiteCloud = SQLiteCloud(appContext = context, config = configuration)
+        val items = mutableListOf<Item>()
+        CoroutineScope(Dispatchers.IO).launch {
+            sqLiteCloud.connect()
+            val r =
+                sqLiteCloud.execute("SELECT * FROM items WHERE dateTimeModified = (SELECT MAX(dateTimeModified) FROM items) LIMIT 1")
+            Log.d("Select latest1", r.value.toString())
+            when (r) {
+                is SQLiteCloudResult.Rowset -> {
+                    val rowset = r.value
+
+                    val columns = rowset.columns // Assuming this is a List<String>
+                    val itemData = mutableMapOf<String, Any?>()
+                    for (row in rowset.rows) { // Assuming this is a List<List<SQLiteCloudValue>>
+                        for ((index, value) in row.withIndex()) {
+                            val columnName = columns[index]
+                            itemData[columnName] = value.toKotlinValue()
+                        }
+                    }
+                    val iD = itemData["id"] as? Int ?: 0
+                    val dateC = itemData["dateCreated"] as? String ?: ""
+                    val dateTimeM = itemData["dateTimeModified"] as? String ?: ""
+                    val cat = itemData["category"] as? String ?: ""
+                    val amnt = itemData["amount"] as? Double ?: 0.0
+                    val curr = itemData["currency"] as? String ?: ""
+                    val exchR = itemData["exchRate"] as? Double ?: 0.0
+                    val finalAm = itemData["finalAmount"] as? Double ?: 0.0
+                    val reg = itemData["regular"] as? Boolean ?: true
+                    val userC = itemData["userCreated"] as? String ?: ""
+                    val userM = itemData["userModified"] as? String ?: ""
+                    val item: Item = Item(
+                        id = iD,
+                        dateCreated = dateC,
+                        dateTimeModified = dateTimeM,
+                        category = cat,
+                        amount = amnt,
+                        currency = curr,
+                        exchRate = exchR,
+                        finalAmount = finalAm,
+                        regular = reg,
+                        userCreated = userC,
+                        userModified = userM
+                    )
+                    items.add(item)
+                }
+                else -> {
+                    // Handle other result types or errors
+                    println("Unexpected result type: ${r::class.simpleName}")
+                }
+            }
+        }
+        Log.d("Downloaded row", items.toString())
+    }
+
+    fun uploadDB(dbName: String, dbPath: Path, encryption: String?, progress: ProgressHandler, context: Context){
+        val configuration = SQLiteCloudConfig.fromString(mainUiState.value.connectionString)
+        val sqLiteCloud = SQLiteCloud(appContext = context, config = configuration)
+
+    }
+
+    fun addItemToServer(context: Context, item: Item){
+        val configuration = SQLiteCloudConfig.fromString(mainUiState.value.connectionString)
+        val sqLiteCloud = SQLiteCloud(appContext = context, config = configuration)
+        CoroutineScope(Dispatchers.IO).launch {
+                sqLiteCloud.connect()
+            val r = sqLiteCloud.execute("INSERT INTO items " +
+                    " VALUES (" + "'" +
+                    item.id.toString() + "', '" +
+                    item.dateCreated + "', '" +
+                    item.dateTimeModified + "', '" +
+                    item.category + "', '" +
+                    item.amount.toString() + "', '" +
+                    item.currency + "', '" +
+                    item.exchRate.toString() + "', '" +
+                    item.finalAmount.toString() + "', '" +
+                    item.regular + "', '" +
+                    item.userCreated + "', '" +
+                    item.userModified + "')"
+            )
+            Log.d("Added to server", r.value.toString())
+        }
+    }
+
     fun populateRegularCategories(items: MutableList<String>){
         categoriesList = items
     }
@@ -197,6 +299,10 @@ class MainScreenViewModel(
                 )
     }
 
+    fun updateAccountInfo(acc: Account){
+        updateUserName(acc.username)
+        updateConnectionString(acc.connectionString)
+    }
     fun updateUserName(user: String) {
         this.account = this.account.copy(
             if (user.length <= 4) user
@@ -208,7 +314,6 @@ class MainScreenViewModel(
             )
         }
     }
-
     fun updateConnectionString(connection: String) {
         this.account = this.account.copy(connectionString = connection)
         _mainUiState.update { connectionUiState ->

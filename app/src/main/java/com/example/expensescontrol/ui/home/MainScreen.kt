@@ -1,5 +1,6 @@
 package com.example.expensescontrol.ui.home
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.ScrollableDefaults
@@ -79,7 +80,10 @@ fun MainScreen(
     statistics.populateRegularCategories(jsonHandler.data.categories)
     var isAccountInfoComplete by remember { mutableStateOf(false) }
     isAccountInfoComplete = viewModel.isAccountSetUp(jsonHandler.data.account)
-    viewModel.sync(context)
+    if (isAccountInfoComplete) {
+        viewModel.updateAccountInfo(jsonHandler.data.account)
+    }
+    viewModel.selectLatest(context)
 
     //UiState for Main screen and for Statistics
     val mainUiState by viewModel.mainScreenRepoUiState.collectAsState()
@@ -278,6 +282,7 @@ fun UserInputCard(
         val coroutineScope = rememberCoroutineScope()
         var showDatePicker by remember { mutableStateOf(false) }
         submitEnabled = viewModel.validateRegularSubmitInput()
+        val context = LocalContext.current
 
         val item = Item(
             dateCreated = mainUiState.dateCreated.toString(),
@@ -388,6 +393,7 @@ fun UserInputCard(
             viewModel.updateDateTimeModified()
             coroutineScope.launch {
                 viewModel.addNewExpense(item)
+                viewModel.addItemToServer(context, item)
                 viewModel.updateInputAmount("")
                 viewModel.updateSelectedCat("Select category")
                 checkedToday = true

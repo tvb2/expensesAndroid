@@ -13,15 +13,18 @@ import androidx.room.Room
 import com.example.expensescontrol.connection.ApiService
 import com.example.expensescontrol.data.ExpensesDatabase
 import com.example.expensescontrol.data.Item
+import com.example.expensescontrol.ui.home.toItemDetails
 import io.sqlitecloud.SQLiteCloud
 import io.sqlitecloud.SQLiteCloudConfig
 import io.sqlitecloud.SQLiteCloudError
+import io.sqlitecloud.SQLiteCloudValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.nio.ByteBuffer
 import kotlin.contracts.contract
 
 /**
@@ -41,9 +44,9 @@ class SyncAdapter @JvmOverloads constructor(
      * If your app uses a content resolver, get an instance of it
      * from the incoming Context
      */
-    val mContentResolver: ContentResolver = context.contentResolver,
-    val mContentProviderClient: ContentProviderClient? = mContentResolver.acquireContentProviderClient("me")
+    private val mContentProviderClient: ContentProviderClient? = context.contentResolver.acquireContentProviderClient("me")
 ) : AbstractThreadedSyncAdapter(context, autoInitialize, allowParallelSyncs) {
+
     override fun onPerformSync(
         account: Account?,
         extras: Bundle?,
@@ -51,47 +54,70 @@ class SyncAdapter @JvmOverloads constructor(
         provider: ContentProviderClient?,
         syncResult: SyncResult?
     ) {
-        val configuration = SQLiteCloudConfig.fromString("sqlitecloud://cscb9azvnz.g1.sqlite.cloud:8860/expenses?apikey=Kz0iFfcTDWMrIbbucMLPjVBJ0LLoLKY4k5or0kX0JAk")
-
-        val sqliteCloud = SQLiteCloud(appContext = context, config = configuration)
-
         // Launch a coroutine
     CoroutineScope(Dispatchers.IO).launch {
-        // Inside the coroutine, you can call your suspend function
-        val item = Item(
-            dateCreated = "2025-02-16",
-            dateTimeModified = "2025-02-16",
-            category = "Grocery",
-            amount = 111.0,
-            currency = "CAD",
-            exchRate = 1.0,
-            finalAmount = 111.0,
-            regular = true,
-            userCreated = "tvb2",
-            userModified = "tvb2"
-        )
-        val result = try {
-            sqliteCloud.connect()
-            sqliteCloud.execute("CREATE TABLE items (" +
-                    "id int," +
-                    "category varchar(255))")
-            "connected"
-        } catch (e: SQLiteCloudError) {
-            "connection error: ${e.message ?: "unknown error"}"
         }
-        Log.d("MyTag", result)
+        // Inside the coroutine, you can call your suspend function
     }
-}
 
-    fun sync(contentProviderClient: ContentProviderClient? = mContentProviderClient){
-        val result: SyncResult = SyncResult()
-        val bundle: Bundle = Bundle()
+    private fun sync(
+        contentProviderClient: ContentProviderClient? = mContentProviderClient){
+        val result = SyncResult()
+        val bundle = Bundle()
         onPerformSync(
-            account = android.accounts.Account("tvb2", "name"),
+            account = Account("tvb2", "name"),
             extras = bundle,
             authority = "me",
             provider = contentProviderClient,
             syncResult = result
         )
     }
+
+//    private suspend fun createTable(sqLiteCloud: SQLiteCloud){
+//        val result = try {
+//            sqLiteCloud.connect()
+//            sqLiteCloud.execute("CREATE TABLE items (" +
+//                    "id int," +
+//                    "dateCreated varchar, " +
+//                    "dateTimeModified varchar, " +
+//                    "category varchar, " +
+//                    "amount double, " +
+//                    "currency varchar, " +
+//                    "exchRate double, " +
+//                    "finalAmount Double, " +
+//                    "regular Boolean, " +
+//                    "userCreated varchar, " +
+//                    "userModified varchar)"
+//            )
+//            "connected"
+//        } catch (e: SQLiteCloudError) {
+//            "connection error: ${e.message ?: "unknown error"}"
+//        }
+//        Log.d("MyTag", result)
+//    }
+
+//    private suspend fun insertItem(sqLiteCloud: SQLiteCloud,  item: Item){
+//        // Construct the SQL INSERT statement
+//        val result = try {
+//            sqLiteCloud.connect()
+//            sqLiteCloud.execute("INSERT INTO items " +
+//                    " VALUES (" + "'" +
+//                    item.id.toString() + "', '" +
+//                    item.dateCreated + "', '" +
+//                    item.dateTimeModified + "', '" +
+//                    item.category + "', '" +
+//                    item.amount.toString() + "', '" +
+//                    item.currency + "', '" +
+//                    item.exchRate.toString() + "', '" +
+//                    item.finalAmount.toString() + "', '" +
+//                    item.regular + "', '" +
+//                    item.userCreated + "', '" +
+//                    item.userModified + "')"
+//            )
+//            "connected"
+//        } catch (e: SQLiteCloudError) {
+//            "connection error: ${e.message ?: "unknown error"}"
+//        }
+//        Log.d("MyTag", result)
+//    }
 }

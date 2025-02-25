@@ -66,6 +66,7 @@ dependencies {
     implementation (libs.retrofit2.retrofit)
     implementation (libs.squareup.converter.gson)
     implementation(project(mapOf("path" to ":sqlitecloud")))
+    implementation(libs.androidx.lifecycle.livedata)
     testImplementation(libs.junit.junit)
     ksp(libs.androidx.room.compiler)
 

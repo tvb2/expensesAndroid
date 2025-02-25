@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<design version="1.18.0">
+ <color g="189" r="186" b="182"/>
+ <edge-color g="0" r="0" b="0"/>
+ <edge-width>2000</edge-width>
+ <text-size>11000</text-size>
+ <corner-radius>5000</corner-radius>
+ <graph>
+  <node w="200000" x="5128" y="-335897" h="94000" index="0">
+   <text>First start: 
+userName
+database path</text>
+   <color g="255" r="255" b="255"/>
+   <text-color g="0" r="0" b="0"/>
+  </node>
+  <node w="444000" x="-380341" y="-177769" h="94000" index="1">
+   <text>Local DB is empty.
+ If server DB is emtpy -> upload local DB
+	else 	   -> download data from server</text>
+   <color g="255" r="255" b="255"/>
+   <text-color g="0" r="0" b="0"/>
+  </node>
+  <edge index0="0" index1="1" reversed="0" arrow-mode="0">
+   <text></text>
+  </edge>
+ </graph>
+</design>
