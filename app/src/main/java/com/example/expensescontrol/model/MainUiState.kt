@@ -28,6 +28,10 @@ data class MainUiState(
 
     val userModified: String = "tvb2",
 
+    val userName: String = "",
+
+    val connectionString: String = "",
+
     val regular: Boolean = true,
 
     val dateDisplayed: String = LocalDate.now()

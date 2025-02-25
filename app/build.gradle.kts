@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp") version "2.1.0-1.0.29"
     id("org.jetbrains.kotlin.plugin.compose")
+    id ("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -59,9 +60,11 @@ dependencies {
     implementation(libs.androidx.room.common)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.constraintlayout)
-    implementation("network.chaintech:kmp-date-time-picker:1.0.7")
+    implementation(libs.kmp.date.time.picker)
     implementation(libs.protolite.well.known.types)
     testImplementation(libs.junit.junit)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.serialization.json)
     ksp(libs.androidx.room.compiler)
 
 }

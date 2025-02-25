@@ -75,8 +75,13 @@ fun MainScreen(
     //Read config data from JSON file
     val context = LocalContext.current
     val jsonHandler = remember { JSonHandler(context) }
-    viewModel.populateRegularCategories(jsonHandler.categoriesList)
-    statistics.populateRegularCategories(jsonHandler.categoriesList)
+    viewModel.populateRegularCategories(jsonHandler.data.categories)
+    statistics.populateRegularCategories(jsonHandler.data.categories)
+    var isAccountInfoComplete by remember { mutableStateOf(false) }
+    isAccountInfoComplete = viewModel.isAccountSetUp(jsonHandler.data.account)
+    if (isAccountInfoComplete) {
+        viewModel.updateAccountInfo(jsonHandler.data.account)
+    }
 
     //ViewModels for Main screen and for Statistics
     val mainUiState by viewModel.mainScreenRepoUiState.collectAsState()

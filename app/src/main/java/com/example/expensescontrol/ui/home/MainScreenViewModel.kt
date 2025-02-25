@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.expensescontrol.data.Account
 import com.example.expensescontrol.model.MainUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -71,6 +72,9 @@ class MainScreenViewModel(
         private set
 
     var amountInput by mutableStateOf("")
+        private set
+
+    var account by mutableStateOf(Account("", ""))
         private set
 
     private val _mainUiState = MutableStateFlow(MainUiState())
@@ -164,6 +168,39 @@ class MainScreenViewModel(
                 )
     }
 
+    fun validateAccountInputData(): Boolean{
+        return(
+                mainUiState.value.userName.isNotBlank() &&
+                        mainUiState.value.connectionString.isNotBlank()
+                )
+    }
+
+    fun updateAccountInfo(acc: Account){
+        updateUserName(acc.username)
+        updateConnectionString(acc.connectionString)
+    }
+    fun updateUserName(user: String) {
+        this.account = this.account.copy(
+            if (user.length <= 4) user
+            else user.subSequence(0, 3).toString()
+        )
+        _mainUiState.update { userUiState ->
+            userUiState.copy(
+                userName = this.account.username
+            )
+        }
+    }
+    fun updateConnectionString(connection: String) {
+        this.account = this.account.copy(connectionString = connection)
+        _mainUiState.update { connectionUiState ->
+            connectionUiState.copy(
+                connectionString = account.connectionString
+            )
+        }
+    }
+    fun isAccountSetUp(account: Account): Boolean{
+        return (account.username != "user1" && account.connectionString != "default")
+    }
     /**
      * Holds current item ui state
      */
