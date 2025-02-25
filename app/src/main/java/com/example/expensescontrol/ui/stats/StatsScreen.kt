@@ -1,41 +1,71 @@
 package com.example.expensescontrol.ui.stats
 
+import android.util.Log
+import android.widget.NumberPicker
+import androidx.activity.result.launch
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableDefaults
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.expensescontrol.ui.theme.ExpensesControlTheme
 import com.example.expensescontrol.R
 import com.example.expensescontrol.ui.AppBottomBar
 import com.example.expensescontrol.ui.AppViewModelProvider
+import com.example.expensescontrol.ui.home.AddNewCategoryDialog
 import com.example.expensescontrol.ui.home.JSonHandler
 import com.example.expensescontrol.ui.home.MainScreenDestination
+import com.example.expensescontrol.ui.home.MainScreenViewModel
 import com.example.expensescontrol.ui.navigation.NavigationDestination
+import kotlinx.coroutines.launch
 
 import java.util.Locale
+import kotlin.math.abs
+import kotlin.text.toFloat
 
 object StatsDestination : NavigationDestination {
     override val route = "stats"
@@ -58,6 +88,10 @@ fun StatsScreen(
     val context = LocalContext.current
     val jsonHandler = remember { JSonHandler(context) }
     statistics.populateRegularCategories(jsonHandler.data.categories)
+    //ViewModels for Main screen and for Statistics
+    val statisticsUiState by statistics.statsUiState.collectAsState()
+    val periods: List<String> = statisticsUiState.periods.keys.toList()
+
     //ViewModels for Main screen and for Statistics
     val statsUiState by statistics.statsUiState.collectAsState()
     var visibleThisPeriod by remember  {mutableStateOf(true)}
@@ -139,12 +173,62 @@ fun StatsScreen(
                     modifier
                 )
             }
+            //Period selection
+            PeriodChooser(
+                periods = periods,
+                onPeriodSelected = {})
             CategoryStatisticsHeader()
             CategoryStatisticsView(
                 statsUiState.categoryStats,
                 modifier = modifier
             )
 
+        }
+    }
+}
+@Composable
+fun PeriodChooser(
+    periods: List<String>,
+    onPeriodSelected: (String) -> Unit,
+    modifier: Modifier = Modifier) {
+
+    val coroutineScope = rememberCoroutineScope()
+
+    LazyRow(
+        state = rememberLazyListState(),
+        contentPadding = PaddingValues(
+            top = 20.dp,
+            bottom = 4.dp,
+            start = 4.dp,
+            end = 4.dp),
+        reverseLayout = false,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .padding(top = 20.dp),
+        flingBehavior = ScrollableDefaults.flingBehavior(),
+        userScrollEnabled = true
+
+    ) {
+        items(periods, key = { item -> item }) { period ->
+            Text(
+                text = period,
+                modifier = Modifier
+                    .padding(2.dp)       // Add padding around each item
+                    .background(
+                        Color.LightGray,
+                        shape = RoundedCornerShape(8.dp)
+                    ) // Background color for each item
+                    .padding(8.dp)// Inner padding within the background
+                    .clickable {
+
+                        coroutineScope.launch {
+
+                        }
+                        onPeriodSelected(period)
+                    },
+                style = MaterialTheme.typography.bodyLarge,
+            )
         }
     }
 }
@@ -310,6 +394,7 @@ fun Stats(
 @Composable
 fun CategoryStatisticsHeader(
     modifier: Modifier = Modifier){
+    Log.d("StatisticsViewModel", "getPeriods() called from main")
     Row(modifier = Modifier
         .padding(
             start = 10.dp,
@@ -321,10 +406,12 @@ fun CategoryStatisticsHeader(
         horizontalArrangement = Arrangement.SpaceBetween
     )
     {
+        val context = LocalContext.current
 //Category name
-        Text(
-            text = stringResource(R.string.category),
-        )
+//        Text(
+//            text = stringResource(R.string.category),
+//        )
+
 //Cat total
         Text(
             text = "Total"
@@ -341,6 +428,68 @@ fun CategoryStatisticsHeader(
         Text(
             text = "Income %"
         )
+    }
+}
+
+// Wheel Picker Composable
+@Composable
+fun PeriodWheelPicker(
+    items: List<String>,
+    onItemSelected: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    itemHeight: Dp = 40.dp,
+    textStyle: TextStyle = TextStyle(fontSize = 18.sp, color = Color.Black)
+) {
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    val itemHeightPx = with(LocalDensity.current) { itemHeight.roundToPx() }
+    var selectedItemIndex by remember { mutableStateOf(0) }
+
+    LaunchedEffect(selectedItemIndex) {
+        onItemSelected(items[selectedItemIndex])
+    }
+
+    Box(modifier = modifier.draggable(
+        orientation = Orientation.Vertical,
+        state = rememberDraggableState { delta ->
+            coroutineScope.launch {
+                listState.scrollBy(-delta)
+            }
+        },
+        onDragStopped = {
+            val targetIndex = (listState.firstVisibleItemScrollOffset / itemHeightPx).toInt()
+            selectedItemIndex = targetIndex
+            coroutineScope.launch {
+                listState.animateScrollToItem(selectedItemIndex)
+            }
+        }
+    )) {
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            state = listState,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items(items) { item ->
+                val index = items.indexOf(item)
+                val offset = abs(listState.firstVisibleItemScrollOffset - index * itemHeightPx)
+                val alpha = 1f - (offset.toFloat() / itemHeightPx)
+                Text(
+                    text = item,
+                    style = textStyle,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .height(itemHeight)
+                        .alpha(if (alpha > 0.5f) alpha else 0.5f)
+                        .onGloballyPositioned {
+                            if (index == 0) {
+                                coroutineScope.launch {
+                                    listState.scrollToItem(selectedItemIndex)
+                                }
+                            }
+                        }
+                )
+            }
+        }
     }
 }
 

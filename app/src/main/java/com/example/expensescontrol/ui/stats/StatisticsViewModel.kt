@@ -16,9 +16,11 @@
 
 package com.example.expensescontrol.ui.stats
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextStyle
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -33,8 +35,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 import kotlinx.datetime.daysUntil
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
 
 import network.chaintech.kmp_date_time_picker.ui.date_range_picker.parseToLocalDate
 
@@ -43,14 +48,18 @@ import network.chaintech.kmp_date_time_picker.utils.now
 
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
+import kotlinx.datetime.*
 
 
 class StatisticsViewModel(
     private val itemsRepository: ItemsRepository): ViewModel() {
 
         init{
-            updateStatistics()
-    }
+            runBlocking {
+                Log.d("StatisticsViewModel", "init block called")
+                updateStatistics()
+            }
+        }
     val statisticsRepoUiState: StateFlow<AllExpensesUiState> =
         itemsRepository.getAllItemsStream().map {items ->
     AllExpensesUiState(items)
@@ -66,19 +75,159 @@ class StatisticsViewModel(
 
     private var categoriesList = mutableListOf("")
 
+    private val periods: MutableMap<String, LocalDate> = mutableMapOf()
+
     private var categorySelected by mutableStateOf("")
 
     private var startDate: String = LocalDate.now().toString()
+    private var startDateLD: LocalDate = LocalDate.now()
     private var startOfPeriod: String = LocalDate.now().toString()
     private var months: Double = 1.0
 
     private val _statsUiState = MutableStateFlow(StatisticsUiState())
     val statsUiState: StateFlow<StatisticsUiState> = _statsUiState.asStateFlow()
 
-    fun populateRegularCategories(items: MutableList<String>){
-        categoriesList = items
+    //Totals
+    suspend fun total(){
+        val total = (itemsRepository.total())
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                total = total
+            )}
+    }
+    suspend fun totalRegular(){
+        val totalRegular = (itemsRepository.totalRegular())
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                totalRegular = totalRegular
+            )}
+    }
+    suspend fun totalIncome(){
+        val totalIncome = (itemsRepository.totalIncome())
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                totalIncome = totalIncome
+            )}
+    }
+    fun totalBalance(){
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                totalBalance =
+                statsUiState.value.totalIncome -
+                        statsUiState.value.total
+            )}
+    }
+    fun totalNonRegular(){
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                totalNonRegular =
+                statsUiState.value.total -
+                        statsUiState.value.totalRegular
+            )}
     }
 
+//Period
+    private fun startOfPeriodUpdate(){
+        val month = LocalDate.now().month
+        val year = LocalDate.now().year
+        startOfPeriod = LocalDate(year, month, 1).toString()
+    }
+    private fun updatePeriods(){
+        Log.d("StatisticsViewModel", "populatePeriods() called")
+        val currentDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        var currentMonth = startDateLD.getYearMonth()
+        val endMonth = currentDate.getYearMonth()
+        periods["AVG"] = LocalDate.now()
+        while (currentMonth <= endMonth) {
+            val firstDayOfMonth = currentMonth.atDay(1)
+            val monthName = currentMonth.second.name.substring(0, 3) // Get first 3 letters of month name
+            val year = currentMonth.first.toString().takeLast(2) // Get last 2 digits of year
+            val formattedMonthYear = "$monthName, $year"
+            periods[formattedMonthYear] = firstDayOfMonth
+            currentMonth = currentMonth.plusMonth()
+        }
+
+        _statsUiState.update { periodsUiState ->
+            periodsUiState.copy(
+                periods = this.periods
+            )}
+        Log.d("StatisticsViewModel", "populatePeriods() finished. periods: $periods")
+
+    }
+    fun getPeriods(): Map<String,LocalDate> {
+        if (periods.isEmpty()) {
+            updatePeriods()
+        }
+        Log.d("StatisticsViewModel", "getPeriods() called. periods: $periods")
+        return periods.toMap() // Return an immutable copy
+    }
+
+    suspend fun periodTotal(){
+        val periodTotal = (itemsRepository.currentPeriodTotal(startOfPeriod))
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                thisPeriodTotal = periodTotal
+            )}
+    }
+    suspend fun periodRegular(){
+        val periodRegular = (itemsRepository.currentPeriodRegular(startOfPeriod))
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                thisPeriodRegular = periodRegular
+            )}
+    }
+    suspend fun periodIncome(){
+        val periodIncome = (itemsRepository.currentPeriodIncome(startOfPeriod))
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                thisPeriodIncome = periodIncome
+            )}
+    }
+    fun periodBalance(){
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                thisPeriodBalance =
+                statsUiState.value.thisPeriodIncome -
+                        statsUiState.value.thisPeriodTotal
+            )}
+    }
+    fun periodNonRegular(){
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                thisPeriodNonRegular =
+                statsUiState.value.thisPeriodTotal -
+                        statsUiState.value.thisPeriodRegular
+            )}
+    }
+
+//Average
+    fun averageRegular(){
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                averageRegular = statsUiState.value.totalRegular/months
+            )}
+    }
+    fun averageNonRegular(){
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                averageNonRegular = statsUiState.value.totalNonRegular/months
+            )}
+    }
+    fun averageIncome(){
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                averageIncome = statsUiState.value.totalIncome/months
+            )}
+    }
+    fun clearCatAverage(){
+        val average = 0
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                selectedCategoryAvg = average
+            )}
+    }
+
+//Category
     private suspend fun updateCategoryStats(){
         val categoryStats: MutableMap<String, CategoryStats> = mutableMapOf(Pair("Grocery",
             CategoryStats()))
@@ -95,13 +244,25 @@ class StatisticsViewModel(
         }
         categoryStats.remove("Income")
         categoryStats.remove("Add new category")
-            val temp = categoryStats.values.toList()
-                _statsUiState.update { selectedCatUiState ->
-                    selectedCatUiState.copy(
-                        categoryStats = temp
-                )}
+        val temp = categoryStats.values.toList()
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                categoryStats = temp
+            )
+        }
+    }
+    suspend fun categoryAverage(){
+        val average=  (itemsRepository.categoryTotal(categorySelected)/months)
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                selectedCategoryAvg = average.toInt()
+            )}
     }
 
+//General functions
+    fun populateRegularCategories(items: MutableList<String>){
+        categoriesList = items
+    }
     fun updateSelectedCat(newCat: String){
         categorySelected = newCat
         _statsUiState.update { selectedCatUiState ->
@@ -109,7 +270,6 @@ class StatisticsViewModel(
                 selectedCategory = newCat
             )}
     }
-
     fun startDateTimeUpdate(){
         _statsUiState.update { startDateTime ->
             startDateTime.copy(
@@ -122,148 +282,18 @@ class StatisticsViewModel(
             )
         }
     }
-
     suspend fun startDateUpdate(){
         val sDate = itemsRepository.startDateUpdate()
         startDate = if(sDate.isNullOrBlank())
             startDate
         else
             sDate
-
         val start = startDate.parseToLocalDate("yyyy-MM-dd")
+        startDateLD = start
         val today = LocalDate.now()
         val numberOfDays = (start.daysUntil(today) + 1).toDouble()
         months = numberOfDays/(365/12)
     }
-
-    private fun startOfPeriodUpdate(){
-        val month = LocalDate.now().month
-        val year = LocalDate.now().year
-        startOfPeriod = LocalDate(year, month, 1).toString()
-    }
-
-    suspend fun categoryAverage(){
-        val average=  (itemsRepository.categoryTotal(categorySelected)/months)
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                selectedCategoryAvg = average.toInt()
-            )}
-    }
-
-    fun averageRegular(){
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                averageRegular = statsUiState.value.totalRegular/months
-            )}
-    }
-
-    fun averageNonRegular(){
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                averageNonRegular = statsUiState.value.totalNonRegular/months
-            )}
-    }
-
-    fun averageIncome(){
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                averageIncome = statsUiState.value.totalIncome/months
-            )}
-    }
-
-    suspend fun periodTotal(){
-        val periodTotal = (itemsRepository.currentPeriodTotal(startOfPeriod))
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                thisPeriodTotal = periodTotal
-            )}
-    }
-
-    suspend fun total(){
-        val total = (itemsRepository.total())
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                total = total
-            )}
-    }
-
-    suspend fun totalRegular(){
-        val totalRegular = (itemsRepository.totalRegular())
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                totalRegular = totalRegular
-            )}
-    }
-
-    suspend fun totalIncome(){
-        val totalIncome = (itemsRepository.totalIncome())
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                totalIncome = totalIncome
-            )}
-    }
-
-    suspend fun periodRegular(){
-        val periodRegular = (itemsRepository.currentPeriodRegular(startOfPeriod))
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                thisPeriodRegular = periodRegular
-            )}
-    }
-
-    suspend fun periodIncome(){
-        val periodIncome = (itemsRepository.currentPeriodIncome(startOfPeriod))
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                thisPeriodIncome = periodIncome
-            )}
-    }
-
-    fun totalBalance(){
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                totalBalance =
-                statsUiState.value.totalIncome -
-                        statsUiState.value.total
-            )}
-    }
-
-    fun totalNonRegular(){
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                totalNonRegular =
-                statsUiState.value.total -
-                        statsUiState.value.totalRegular
-            )}
-    }
-
-    fun periodBalance(){
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                thisPeriodBalance =
-                statsUiState.value.thisPeriodIncome -
-                statsUiState.value.thisPeriodTotal
-            )}
-    }
-
-    fun periodNonRegular(){
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                 thisPeriodNonRegular =
-                    statsUiState.value.thisPeriodTotal -
-                    statsUiState.value.thisPeriodRegular
-            )}
-    }
-
-
-    fun clearCatAverage(){
-        val average = 0
-        _statsUiState.update { selectedCatUiState ->
-            selectedCatUiState.copy(
-                selectedCategoryAvg = average
-            )}
-    }
-
     fun updateStatistics(){
         viewModelScope.launch {
             startDateUpdate()
@@ -285,6 +315,33 @@ class StatisticsViewModel(
             averageIncome()
             updateCategoryStats()
             clearCatAverage()
+            updatePeriods()
         }
     }
+}
+// Extension function to get a YearMonth-like representation
+fun LocalDate.getYearMonth(): Pair<Int, Month> {
+    return Pair(this.year, this.month)
+}
+
+// Extension function to compare YearMonth-like representations
+operator fun Pair<Int, Month>.compareTo(other: Pair<Int, Month>): Int {
+    return when {
+        this.first < other.first -> -1
+        this.first > other.first -> 1
+        this.second < other.second -> -1
+        this.second > other.second -> 1
+        else -> 0
+    }
+}
+// Extension function to add one month to a YearMonth-like representation
+fun Pair<Int, Month>.plusMonth(): Pair<Int, Month> {
+    val newMonth = this.second.plus(1)
+    val newYear = if (newMonth.number == 1) this.first + 1 else this.first
+    return Pair(newYear, newMonth)
+}
+
+// Extension function to get the first day of the month
+fun Pair<Int, Month>.atDay(day: Int): LocalDate {
+    return LocalDate(this.first, this.second, day)
 }

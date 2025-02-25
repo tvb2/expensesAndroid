@@ -1,6 +1,7 @@
 package com.example.expensescontrol.model
 
 import com.example.expensescontrol.ui.stats.CategoryStats
+import kotlinx.datetime.LocalDate
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
@@ -14,6 +15,8 @@ data class StatisticsUiState(
                 OffsetDateTime.now().offset
             )
             .toString(),
+    val periods: MutableMap<String, LocalDate> = mutableMapOf(),
+
 
     //Total values
     val total: Double = 0.0,
