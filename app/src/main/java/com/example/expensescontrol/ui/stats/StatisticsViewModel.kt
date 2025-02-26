@@ -60,19 +60,6 @@ class StatisticsViewModel(
                 updateStatistics()
             }
         }
-    val statisticsRepoUiState: StateFlow<AllExpensesUiState> =
-        itemsRepository.getAllItemsStream().map {items ->
-    AllExpensesUiState(items)
-        }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = AllExpensesUiState()
-            )
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
-    }
-
     private var categoriesList = mutableListOf("")
 
     private val periods: MutableMap<String, LocalDate> = mutableMapOf()
@@ -134,17 +121,19 @@ class StatisticsViewModel(
     }
     private fun updatePeriods(){
         Log.d("StatisticsViewModel", "populatePeriods() called")
-        val currentDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-        var currentMonth = startDateLD.getYearMonth()
-        val endMonth = currentDate.getYearMonth()
-        periods["AVG"] = LocalDate.now()
-        while (currentMonth <= endMonth) {
+        val currentDate = LocalDate.now()//Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        var currentMonth = currentDate.getYearMonth()
+        val startMonth = startDateLD.getYearMonth()
+
+
+        periods["AVG"] = currentDate
+        while (currentMonth >= startMonth) {
             val firstDayOfMonth = currentMonth.atDay(1)
             val monthName = currentMonth.second.name.substring(0, 3) // Get first 3 letters of month name
             val year = currentMonth.first.toString().takeLast(2) // Get last 2 digits of year
             val formattedMonthYear = "$monthName, $year"
             periods[formattedMonthYear] = firstDayOfMonth
-            currentMonth = currentMonth.plusMonth()
+            currentMonth = currentMonth.minusMonth()
         }
 
         _statsUiState.update { periodsUiState ->
@@ -154,14 +143,6 @@ class StatisticsViewModel(
         Log.d("StatisticsViewModel", "populatePeriods() finished. periods: $periods")
 
     }
-    fun getPeriods(): Map<String,LocalDate> {
-        if (periods.isEmpty()) {
-            updatePeriods()
-        }
-        Log.d("StatisticsViewModel", "getPeriods() called. periods: $periods")
-        return periods.toMap() // Return an immutable copy
-    }
-
     suspend fun periodTotal(){
         val periodTotal = (itemsRepository.currentPeriodTotal(startOfPeriod))
         _statsUiState.update { selectedCatUiState ->
@@ -229,6 +210,29 @@ class StatisticsViewModel(
 
 //Category
     private suspend fun updateCategoryStats(){
+    val categoryStats: MutableMap<String, CategoryStats> = mutableMapOf(Pair("Grocery",
+        CategoryStats()))
+
+    for (category in categoriesList) {
+        if (category != "Income" && category != "Add new category") {
+            val catStat = CategoryStats()
+            val total: Double = itemsRepository.categoryTotal(category)
+            catStat.catTotal = total //itemsRepository.categoryTotal(category)
+            catStat.category = category
+            catStat.catAverage = catStat.catTotal / months
+            catStat.catNPeriodsAverage = catStat.catAverage //To be implemented yet
+            catStat.catPerCentIncome = 100 * catStat.catAverage / statsUiState.value.averageIncome
+            categoryStats[category] = catStat
+        }
+    }
+    _statsUiState.update { selectedCatUiState ->
+        selectedCatUiState.copy(
+            categoryStats = categoryStats
+        )
+    }
+}
+    /*
+    private suspend fun updateCategoryStats(){
         val categoryStats: MutableMap<String, CategoryStats> = mutableMapOf(Pair("Grocery",
             CategoryStats()))
 
@@ -251,7 +255,34 @@ class StatisticsViewModel(
             )
         }
     }
+
+     */
+    private suspend fun updateCategoryStats(start: LocalDate, end: LocalDate){
+        val newCategoryStats: MutableMap<String, CategoryStats> = mutableMapOf(Pair("Grocery",
+            CategoryStats()))
+
+        for (category in categoriesList) {
+            if (category != "Income" && category != "Add new category") {
+                val currentCatStat = _statsUiState.value.categoryStats[category]!!
+                //param total is required to ensure itemsRepository is complete before we assign it to catStat
+                val total: Double = itemsRepository.categoryPeriodTotal(category, start.toString(), end.toString())
+                // Create a NEW CategoryStats object with the updated value
+                val newCatStat = if (currentCatStat != null) {
+                    currentCatStat.copy(catTotal = total) // Use copy() to create a new instance
+                } else {
+                    CategoryStats(catTotal = total) // Create a new instance if it doesn't exist
+                }
+                newCategoryStats[category] = newCatStat
+            }
+        }
+        _statsUiState.update { selectedCatUiState ->
+            selectedCatUiState.copy(
+                categoryStats = newCategoryStats
+            )
+        }
+    }
     suspend fun categoryAverage(){
+
         val average=  (itemsRepository.categoryTotal(categorySelected)/months)
         _statsUiState.update { selectedCatUiState ->
             selectedCatUiState.copy(
@@ -269,6 +300,18 @@ class StatisticsViewModel(
             selectedCatUiState.copy(
                 selectedCategory = newCat
             )}
+    }
+    suspend fun updateSelectedPeriod(period: String){
+        if (period == "AVG"){
+            updateCategoryStats()
+        }else{
+            val startDate = _statsUiState.value.periods[period]
+            val endDate =
+                startDate?.plus(1, DateTimeUnit.MONTH)//_statsUiState.value.periods[period.plus("1")]
+            if (startDate != null && endDate != null) {
+                updateCategoryStats(startDate, endDate)
+            }
+        }
     }
     fun startDateTimeUpdate(){
         _statsUiState.update { startDateTime ->
@@ -338,6 +381,12 @@ operator fun Pair<Int, Month>.compareTo(other: Pair<Int, Month>): Int {
 fun Pair<Int, Month>.plusMonth(): Pair<Int, Month> {
     val newMonth = this.second.plus(1)
     val newYear = if (newMonth.number == 1) this.first + 1 else this.first
+    return Pair(newYear, newMonth)
+}
+// Extension function to subtract one month from a YearMonth-like representation
+fun Pair<Int, Month>.minusMonth(): Pair<Int, Month> {
+    val newMonth = this.second.minus(1)
+    val newYear = if (newMonth.number == 12) this.first - 1 else this.first
     return Pair(newYear, newMonth)
 }
 

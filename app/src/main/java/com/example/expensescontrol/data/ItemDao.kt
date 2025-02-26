@@ -29,6 +29,9 @@ interface ItemDao {
     @Query("SELECT SUM(finalAmount) FROM items WHERE category = :cat")
     suspend fun categoryTotal(cat:String): Double
 
+    @Query("SELECT SUM(finalAmount) FROM items WHERE category = :cat AND dateCreated >= :startDate AND dateCreated < :endDate")
+    suspend fun categoryPeriodTotal(cat:String, startDate: String, endDate: String): Double
+
     @Query("SELECT SUM(finalAmount) FROM items WHERE category != 'Income' ")
     suspend fun total(): Double
 

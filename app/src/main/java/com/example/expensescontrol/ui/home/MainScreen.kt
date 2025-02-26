@@ -184,7 +184,6 @@ fun CategoryChooser(
     }
     if (isAddNewCategoryDialogVisible){
         AddNewCategoryDialog(
-            jsonHandler = jsonHandler,
             viewModel = viewModel,
             onDismissRequest = {
                 onCategorySelected("")
@@ -201,7 +200,6 @@ fun CategoryChooser(
 
 @Composable
 fun AddNewCategoryDialog(
-    jsonHandler: JSonHandler,
     viewModel: MainScreenViewModel,
     onDismissRequest: () -> Unit,
     onSubmitRequest: () -> Unit

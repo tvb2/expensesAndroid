@@ -42,5 +42,6 @@ data class StatisticsUiState(
     val selectedCategoryAvg: Int = 0,
     val selectedCategoryTotal: Double = 0.0,
     val selectedCategoryTotalThisPeriod: Double = 0.0,
-    val categoryStats: List<CategoryStats> = listOf()
+//    val categoryStats: List<CategoryStats> = listOf()
+    val categoryStats: Map<String, CategoryStats> = mapOf()
 )

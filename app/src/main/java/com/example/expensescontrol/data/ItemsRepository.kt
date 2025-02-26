@@ -60,6 +60,9 @@ interface ItemsRepository{
     @Query("SELECT SUM(finalAmount) FROM items WHERE category = :cat")
     suspend fun categoryTotal(cat:String): Double
 
+    @Query("SELECT SUM(finalAmount) FROM items WHERE category = :cat AND dateCreated >= :startDate AND dateCreated < :endDate")
+    suspend fun categoryPeriodTotal(cat:String, startDate: String, endDate: String): Double
+
     @Query("SELECT dateCreated FROM items ORDER BY dateCreated ASC LIMIT 1")
     suspend fun startDateUpdate(): String
 

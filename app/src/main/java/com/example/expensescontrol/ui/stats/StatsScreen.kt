@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.expensescontrol.ui.theme.ExpensesControlTheme
 import com.example.expensescontrol.R
+import com.example.expensescontrol.model.StatisticsUiState
 import com.example.expensescontrol.ui.AppBottomBar
 import com.example.expensescontrol.ui.AppViewModelProvider
 import com.example.expensescontrol.ui.home.AddNewCategoryDialog
@@ -88,9 +89,7 @@ fun StatsScreen(
     val context = LocalContext.current
     val jsonHandler = remember { JSonHandler(context) }
     statistics.populateRegularCategories(jsonHandler.data.categories)
-    //ViewModels for Main screen and for Statistics
-    val statisticsUiState by statistics.statsUiState.collectAsState()
-    val periods: List<String> = statisticsUiState.periods.keys.toList()
+
 
     //ViewModels for Main screen and for Statistics
     val statsUiState by statistics.statsUiState.collectAsState()
@@ -175,11 +174,11 @@ fun StatsScreen(
             }
             //Period selection
             PeriodChooser(
-                periods = periods,
-                onPeriodSelected = {})
+                statistics = statistics,
+            )
             CategoryStatisticsHeader()
             CategoryStatisticsView(
-                statsUiState.categoryStats,
+                statsUiState = statsUiState,
                 modifier = modifier
             )
 
@@ -188,11 +187,13 @@ fun StatsScreen(
 }
 @Composable
 fun PeriodChooser(
-    periods: List<String>,
-    onPeriodSelected: (String) -> Unit,
+    statistics: StatisticsViewModel,
     modifier: Modifier = Modifier) {
 
     val coroutineScope = rememberCoroutineScope()
+    //ViewModels for Main screen and for Statistics
+    val statisticsUiState by statistics.statsUiState.collectAsState()
+    val periods: List<String> = statisticsUiState.periods.keys.toList()
 
     LazyRow(
         state = rememberLazyListState(),
@@ -221,11 +222,9 @@ fun PeriodChooser(
                     ) // Background color for each item
                     .padding(8.dp)// Inner padding within the background
                     .clickable {
-
                         coroutineScope.launch {
-
+                            statistics.updateSelectedPeriod(period)
                         }
-                        onPeriodSelected(period)
                     },
                 style = MaterialTheme.typography.bodyLarge,
             )
@@ -408,9 +407,9 @@ fun CategoryStatisticsHeader(
     {
         val context = LocalContext.current
 //Category name
-//        Text(
-//            text = stringResource(R.string.category),
-//        )
+        Text(
+            text = stringResource(R.string.category),
+        )
 
 //Cat total
         Text(
@@ -431,80 +430,20 @@ fun CategoryStatisticsHeader(
     }
 }
 
-// Wheel Picker Composable
-@Composable
-fun PeriodWheelPicker(
-    items: List<String>,
-    onItemSelected: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    itemHeight: Dp = 40.dp,
-    textStyle: TextStyle = TextStyle(fontSize = 18.sp, color = Color.Black)
-) {
-    val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-    val itemHeightPx = with(LocalDensity.current) { itemHeight.roundToPx() }
-    var selectedItemIndex by remember { mutableStateOf(0) }
-
-    LaunchedEffect(selectedItemIndex) {
-        onItemSelected(items[selectedItemIndex])
-    }
-
-    Box(modifier = modifier.draggable(
-        orientation = Orientation.Vertical,
-        state = rememberDraggableState { delta ->
-            coroutineScope.launch {
-                listState.scrollBy(-delta)
-            }
-        },
-        onDragStopped = {
-            val targetIndex = (listState.firstVisibleItemScrollOffset / itemHeightPx).toInt()
-            selectedItemIndex = targetIndex
-            coroutineScope.launch {
-                listState.animateScrollToItem(selectedItemIndex)
-            }
-        }
-    )) {
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            state = listState,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            items(items) { item ->
-                val index = items.indexOf(item)
-                val offset = abs(listState.firstVisibleItemScrollOffset - index * itemHeightPx)
-                val alpha = 1f - (offset.toFloat() / itemHeightPx)
-                Text(
-                    text = item,
-                    style = textStyle,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .height(itemHeight)
-                        .alpha(if (alpha > 0.5f) alpha else 0.5f)
-                        .onGloballyPositioned {
-                            if (index == 0) {
-                                coroutineScope.launch {
-                                    listState.scrollToItem(selectedItemIndex)
-                                }
-                            }
-                        }
-                )
-            }
-        }
-    }
-}
-
 @Composable
 fun CategoryStatisticsView(
-    itemList: List<CategoryStats>,
+    statsUiState: StatisticsUiState,
+//    itemList: List<CategoryStats>,
     modifier: Modifier) {
+    val items = statsUiState.categoryStats.values.toList()
 
     Card(modifier = Modifier) {
         Column(modifier = Modifier.fillMaxWidth())
         {
             LazyColumn(modifier = modifier){
-                items(itemList) { oldExpenses ->
+                items(items) { catStats ->
                     CategoryStatisticsCard(
-                        oldExpenses
+                        catStats
                     )
                 }
             }
