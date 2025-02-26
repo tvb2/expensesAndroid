@@ -43,6 +43,8 @@
     <string name="enter_non_regular_description">Enter short description of expense:</string>
     <string name="cancel">Cancel</string>
     <string name="enter_new_category_name">Enter new category name</string>
+    <string name="enter_connection_string">Enter connection name</string>
+    <string name="enter_username">Enter user name</string>
 
 
 </resources>

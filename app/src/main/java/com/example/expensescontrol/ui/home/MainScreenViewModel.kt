@@ -201,6 +201,7 @@ class MainScreenViewModel(
     fun isAccountSetUp(account: Account): Boolean{
         return (account.username != "user1" && account.connectionString != "default")
     }
+
     /**
      * Holds current item ui state
      */

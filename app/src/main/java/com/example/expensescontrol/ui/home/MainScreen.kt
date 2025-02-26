@@ -104,6 +104,16 @@ fun MainScreen(
                 modifier = modifier
                     .padding(innerPadding)
             ) {
+                if (!isAccountInfoComplete){
+                    AddNewAccountDialog(
+                        viewModel = viewModel,
+                        onDismissRequest = {},
+                        onSubmitRequest = {
+                            isAccountInfoComplete = true
+                            jsonHandler.updateAccount(viewModel.account)
+                        }
+                    )
+                }
                 CategoryChooser(
                     jsonHandler = jsonHandler,
                     viewModel = viewModel,
@@ -389,6 +399,62 @@ fun UserInputCard(
             text = stringResource(R.string.submit)
         )
     }
+    }
+}
+
+@Composable
+fun AddNewAccountDialog(
+    viewModel: MainScreenViewModel,
+    onDismissRequest: () -> Unit,
+    onSubmitRequest: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = {}
+    ) {
+        Card(
+            modifier = Modifier
+                .padding(8.dp),
+        ) {
+            //Username
+            OutlinedTextField(
+                value = viewModel.account.username,
+                onValueChange = {viewModel.updateUserName(it)},
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                label = {Text(stringResource(R.string.enter_username))}
+            )
+            //ConnectionString
+            OutlinedTextField(
+                value = viewModel.account.connectionString,
+                onValueChange = { viewModel.updateConnectionString(it) },
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                label = {Text(stringResource(R.string.enter_connection_string))}
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(
+                    enabled = viewModel.validateAccountInputData(),
+                    onClick = {
+                        onSubmitRequest()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.submit)
+                    )
+                }
+            }
+
+        }
     }
 }
 
