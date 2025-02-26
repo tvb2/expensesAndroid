@@ -30,11 +30,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_18
+        targetCompatibility = JavaVersion.VERSION_18
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "18"
     }
     buildFeatures {
         compose = true
@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.kmp.date.time.picker)
     implementation(libs.protolite.well.known.types)
+    implementation(project(":sqlitecloud"))
     testImplementation(libs.junit.junit)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.serialization.json)

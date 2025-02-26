@@ -47,6 +47,7 @@ import com.example.expensescontrol.ui.AppBottomBar
 import com.example.expensescontrol.ui.AppViewModelProvider
 import com.example.expensescontrol.ui.navigation.NavigationDestination
 import com.example.expensescontrol.ui.stats.StatisticsViewModel
+import com.example.expensescontrol.ui.sync.Sync
 import com.example.expensescontrol.ui.theme.ExpensesControlTheme
 import kotlinx.coroutines.launch
 import network.chaintech.kmp_date_time_picker.ui.datepicker.WheelDatePickerView
@@ -87,6 +88,9 @@ fun MainScreen(
     val mainUiState by viewModel.mainScreenRepoUiState.collectAsState()
 
     val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
+
+    val sync: Sync = Sync()
+    sync.selectLatest(context)
 
     Scaffold (
         bottomBar = { AppBottomBar(
