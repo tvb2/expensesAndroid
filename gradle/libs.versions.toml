@@ -2,6 +2,8 @@
 agp = "8.7.3"
 composeBomVersion = "2024.12.01"
 constraintlayout = "2.2.0"
+hiltAndroid = "2.55"
+hiltAndroidCompiler = "2.51.1"
 kmpDateTimePicker = "1.0.7"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
@@ -21,6 +23,7 @@ roomCompiler = "2.6.1"
 roomKtx = "2.6.1"
 junitJunit = "4.12"
 protoliteWellKnownTypes = "18.0.0"
+monitor = "1.6.1"
 
 [libraries]
 androidx-compose-bom-v20241201 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
@@ -28,6 +31,8 @@ androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayo
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -55,6 +60,7 @@ ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
 protolite-well-known-types = { group = "com.google.firebase", name = "protolite-well-known-types", version.ref = "protoliteWellKnownTypes" }
+androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

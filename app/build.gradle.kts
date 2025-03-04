@@ -66,6 +66,7 @@ dependencies {
     testImplementation(libs.junit.junit)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.serialization.json)
+    androidTestImplementation(libs.androidx.monitor)
     ksp(libs.androidx.room.compiler)
 
 }

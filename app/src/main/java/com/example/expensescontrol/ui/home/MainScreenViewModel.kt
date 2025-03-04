@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.update
 import com.example.expensescontrol.data.Item
 import com.example.expensescontrol.data.ItemsRepository
 import com.example.expensescontrol.ui.allexp.AllExpensesUiState
+import com.example.expensescontrol.ui.sync.Sync
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -44,7 +45,9 @@ import java.time.OffsetDateTime
  * ViewModel to retrieve all items in the Room database.
  */
 class MainScreenViewModel(
-    private val itemsRepository: ItemsRepository): ViewModel() {
+    private val itemsRepository: ItemsRepository,
+    val sync: Sync
+): ViewModel() {
 
      private val isAscending: Boolean = false // Change this as needed
 
@@ -64,8 +67,6 @@ class MainScreenViewModel(
     }
 
     var categoriesList = mutableListOf("")
-    val currency = "CAD"
-    val user = "tvb2"
     val rate: Double = 1.0
 
     var categorySelected by mutableStateOf("")

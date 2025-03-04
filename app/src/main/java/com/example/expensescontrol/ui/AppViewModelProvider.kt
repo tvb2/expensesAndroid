@@ -54,7 +54,9 @@ object AppViewModelProvider {
 
         // Initializer for MainScreenViewModel
         initializer {
-            MainScreenViewModel(expensesApplication().container.itemsRepository)
+            MainScreenViewModel(
+                expensesApplication().container.itemsRepository,
+                expensesApplication().container.sync) // Inject Sync here)
         }
     }
 }

@@ -89,9 +89,6 @@ fun MainScreen(
 
     val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
 
-    val sync: Sync = Sync()
-    sync.selectLatest(context)
-
     Scaffold (
         bottomBar = { AppBottomBar(
             config = "main",
