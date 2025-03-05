@@ -17,6 +17,7 @@
 package com.example.expensescontrol.data
 
 import android.content.Context
+import com.example.expensescontrol.ui.home.JSonHandler
 import com.example.expensescontrol.ui.sync.Sync
 
 /**
@@ -25,6 +26,7 @@ import com.example.expensescontrol.ui.sync.Sync
 interface AppContainer {
     val itemsRepository: ItemsRepository
     val sync: Sync
+    val jsonhandler: JSonHandler
 }
 
 /**
@@ -39,5 +41,8 @@ class AppDataContainer(private val context: Context) : AppContainer {
     }
     override val sync: Sync by lazy {
         Sync()
+    }
+    override val jsonhandler: JSonHandler by lazy {
+        JSonHandler(context)
     }
 }

@@ -46,7 +46,8 @@ import java.time.OffsetDateTime
  */
 class MainScreenViewModel(
     private val itemsRepository: ItemsRepository,
-    val sync: Sync
+    val sync: Sync,
+    jSonHandler: JSonHandler
 ): ViewModel() {
 
      private val isAscending: Boolean = false // Change this as needed
@@ -68,23 +69,19 @@ class MainScreenViewModel(
 
     var categoriesList = mutableListOf("")
     val rate: Double = 1.0
-
     var categorySelected by mutableStateOf("")
         private set
-
     var amountInput by mutableStateOf("")
         private set
-
     var account by mutableStateOf(Account("", ""))
         private set
-
+    private val jsonhandler = jSonHandler
     private val _mainUiState = MutableStateFlow(MainUiState())
     val mainUiState: StateFlow<MainUiState> = _mainUiState.asStateFlow()
 
-    fun populateRegularCategories(items: MutableList<String>){
-        categoriesList = items
+    fun populateRegularCategories(){
+        categoriesList = jsonhandler.data.categories
     }
-
     fun updateSelectedCat(newCat: String){
         if (newCat != "Add new category") {
             categorySelected = newCat
@@ -96,11 +93,10 @@ class MainScreenViewModel(
             categorySelected = "adding new...."//initiate Add New Category actions
         }
     }
-
     fun addNewRegularCat(newCat: String){
         categoriesList.add(newCat)
+        jsonhandler.updateCategories(categoriesList)
     }
-
     private fun listSorted(items: List<Item>, isAscending: Boolean = false): List<Item>{
         // Sort items based on the desired column sortedByDescending or sortedBy for ascending order
         val sortedlist = if (isAscending) {
@@ -110,7 +106,6 @@ class MainScreenViewModel(
         }
         return sortedlist
     }
-
     fun updateInputAmount(amount: String){
         amountInput = amount
         _mainUiState.update { amountUiState ->
@@ -125,7 +120,6 @@ class MainScreenViewModel(
             )
         }
 }
-
     fun onCheckedTodayChecked(){
         _mainUiState.update { createdDateUiState ->
             createdDateUiState.copy(
@@ -133,7 +127,6 @@ class MainScreenViewModel(
             )
         }
     }
-
     fun onCreatedDateChange(newDate: LocalDate){
         _mainUiState.update { createdDateUiState ->
             createdDateUiState.copy(
@@ -141,7 +134,6 @@ class MainScreenViewModel(
             )
         }
     }
-
     fun updateDateTimeModified(){
         _mainUiState.update { dateTimeModifiedUiState ->
             dateTimeModifiedUiState.copy(
@@ -154,31 +146,30 @@ class MainScreenViewModel(
             )
         }
     }
-
     fun validateRegularSubmitInput(): Boolean {
         return (
                 categoriesList.contains(_mainUiState.value.selectedCategory) &&
                 _mainUiState.value.amount != 0.0
                 )
     }
-
     fun validateNonRegularSubmitInput(): Boolean {
         return (
                 _mainUiState.value.selectedCategory.isNotEmpty() &&
                         _mainUiState.value.amount != 0.0
                 )
     }
-
     fun validateAccountInputData(): Boolean{
         return(
                 mainUiState.value.userName.isNotBlank() &&
                         mainUiState.value.connectionString.isNotBlank()
                 )
     }
-
-    fun updateAccountInfo(acc: Account){
-        updateUserName(acc.username)
-        updateConnectionString(acc.connectionString)
+    fun readAccountInfo(){
+        updateUserName(jsonhandler.data.account.username)
+        updateConnectionString(jsonhandler.data.account.connectionString)
+    }
+    fun updateAccount(){
+        jsonhandler.updateAccount(account)
     }
     fun updateUserName(user: String) {
         this.account = this.account.copy(
@@ -199,8 +190,9 @@ class MainScreenViewModel(
             )
         }
     }
-    fun isAccountSetUp(account: Account): Boolean{
-        return (account.username != "user1" && account.connectionString != "default")
+    fun isAccountSetUp(): Boolean{
+        return (jsonhandler.data.account.username != "user1" &&
+                jsonhandler.data.account.connectionString != "default")
     }
 
     /**

@@ -45,7 +45,9 @@ object AppViewModelProvider {
 
         // Initializer for StatisticsViewModel
         initializer {
-            StatisticsViewModel(expensesApplication().container.itemsRepository)
+            StatisticsViewModel(
+                expensesApplication().container.itemsRepository,
+                expensesApplication().container.jsonhandler)
         }
         // Initializer for AllExpensesViewModel
         initializer {
@@ -56,7 +58,8 @@ object AppViewModelProvider {
         initializer {
             MainScreenViewModel(
                 expensesApplication().container.itemsRepository,
-                expensesApplication().container.sync) // Inject Sync here)
+                expensesApplication().container.sync,
+                expensesApplication().container.jsonhandler)
         }
     }
 }

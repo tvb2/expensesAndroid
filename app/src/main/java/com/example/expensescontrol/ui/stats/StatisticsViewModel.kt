@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.update
 import com.example.expensescontrol.data.ItemsRepository
 import com.example.expensescontrol.model.StatisticsUiState
 import com.example.expensescontrol.ui.allexp.AllExpensesUiState
+import com.example.expensescontrol.ui.home.JSonHandler
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -52,7 +53,8 @@ import kotlinx.datetime.*
 
 
 class StatisticsViewModel(
-    private val itemsRepository: ItemsRepository): ViewModel() {
+    private val itemsRepository: ItemsRepository,
+    jsonhandler: JSonHandler): ViewModel() {
 
         init{
             runBlocking {
@@ -61,15 +63,13 @@ class StatisticsViewModel(
             }
         }
     private var categoriesList = mutableListOf("")
-
     private val periods: MutableMap<String, LocalDate> = mutableMapOf()
-
     private var categorySelected by mutableStateOf("")
-
     private var startDate: String = LocalDate.now().toString()
     private var startDateLD: LocalDate = LocalDate.now()
     private var startOfPeriod: String = LocalDate.now().toString()
     private var months: Double = 1.0
+    private val jsonhandler = jsonhandler
 
     private val _statsUiState = MutableStateFlow(StatisticsUiState())
     val statsUiState: StateFlow<StatisticsUiState> = _statsUiState.asStateFlow()
@@ -291,8 +291,8 @@ class StatisticsViewModel(
     }
 
 //General functions
-    fun populateRegularCategories(items: MutableList<String>){
-        categoriesList = items
+    fun populateRegularCategories(){
+        categoriesList = this.jsonhandler.data.categories
     }
     fun updateSelectedCat(newCat: String){
         categorySelected = newCat
@@ -361,6 +361,7 @@ class StatisticsViewModel(
             updatePeriods()
         }
     }
+
 }
 // Extension function to get a YearMonth-like representation
 fun LocalDate.getYearMonth(): Pair<Int, Month> {

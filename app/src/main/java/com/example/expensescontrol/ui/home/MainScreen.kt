@@ -74,19 +74,16 @@ fun MainScreen(
 )
 {
     //Read config data from JSON file
-    val context = LocalContext.current
-    val jsonHandler = remember { JSonHandler(context) }
-    viewModel.populateRegularCategories(jsonHandler.data.categories)
-    statistics.populateRegularCategories(jsonHandler.data.categories)
+    viewModel.populateRegularCategories()
+    statistics.populateRegularCategories()
     var isAccountInfoComplete by remember { mutableStateOf(false) }
-    isAccountInfoComplete = viewModel.isAccountSetUp(jsonHandler.data.account)
+    isAccountInfoComplete = viewModel.isAccountSetUp()
     if (isAccountInfoComplete) {
-        viewModel.updateAccountInfo(jsonHandler.data.account)
+        viewModel.readAccountInfo()
     }
 
     //ViewModels for Main screen and for Statistics
     val mainUiState by viewModel.mainScreenRepoUiState.collectAsState()
-
     val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
 
     Scaffold (
@@ -111,12 +108,11 @@ fun MainScreen(
                         onDismissRequest = {},
                         onSubmitRequest = {
                             isAccountInfoComplete = true
-                            jsonHandler.updateAccount(viewModel.account)
+                            viewModel.updateAccount()
                         }
                     )
                 }
                 CategoryChooser(
-                    jsonHandler = jsonHandler,
                     viewModel = viewModel,
                     stats = statistics,
                     onCategorySelected = {
@@ -140,7 +136,6 @@ fun MainScreen(
 
 @Composable
 fun CategoryChooser(
-    jsonHandler: JSonHandler,
     viewModel: MainScreenViewModel,
     stats: StatisticsViewModel,
     onCategorySelected: (String) -> Unit,
@@ -202,7 +197,6 @@ fun CategoryChooser(
             },
             onSubmitRequest = {
                 viewModel.addNewRegularCat(viewModel.categorySelected)
-                jsonHandler.updateCategories(viewModel.categoriesList)
                 isAddNewCategoryDialogVisible = false
             }
         )

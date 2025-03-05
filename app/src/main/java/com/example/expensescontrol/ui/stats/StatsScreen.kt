@@ -87,8 +87,7 @@ fun StatsScreen(
 
     //Read config data from JSON file
     val context = LocalContext.current
-    val jsonHandler = remember { JSonHandler(context) }
-    statistics.populateRegularCategories(jsonHandler.data.categories)
+    statistics.populateRegularCategories()
 
 
     //ViewModels for Main screen and for Statistics
