@@ -19,7 +19,9 @@ package com.example.expensescontrol
 import android.app.Application
 import com.example.expensescontrol.data.AppContainer
 import com.example.expensescontrol.data.AppDataContainer
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
 class ExpensesApplication : Application() {
 
     /**
