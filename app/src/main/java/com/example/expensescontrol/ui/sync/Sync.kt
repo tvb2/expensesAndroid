@@ -2,8 +2,6 @@ package com.example.expensescontrol.ui.sync
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.ui.geometry.isEmpty
-import com.example.expensescontrol.data.Account
 import com.example.expensescontrol.data.Item
 import io.sqlitecloud.SQLiteCloud
 import io.sqlitecloud.SQLiteCloudConfig
@@ -13,12 +11,8 @@ import io.sqlitecloud.SQLiteCloudValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.OffsetDateTime
 import java.time.format.DateTimeParseException
-import kotlin.text.indexOf
 import kotlin.text.toBoolean
-import kotlin.text.toDouble
 
 class Sync() {
     var connectionString = "default" // "sqlitecloud://cscb9azvnz.g1.sqlite.cloud:8860/expenses?apikey=Kz0iFfcTDWMrIbbucMLPjVBJ0LLoLKY4k5or0kX0JAk"
@@ -36,6 +30,10 @@ class Sync() {
             do
      */
     fun synchronize(localEmpty: Boolean, context: Context) {
+        val configuration = SQLiteCloudConfig.fromString(connectionString)
+        val sqLiteCloud = SQLiteCloud(appContext = context, config = configuration)
+        remoteEmpty = isRemoteEmpty(context)
+
         if (localEmpty) {
             if (remoteEmpty) {
                 //do
@@ -44,7 +42,7 @@ class Sync() {
             }
         }else{
             if (remoteEmpty) {
-                //do
+                //
             } else {
                 //do
             }
@@ -71,7 +69,8 @@ class Sync() {
         this.connectionString = connectionString
     }
 
-    private fun checkRemoteEmpty(context: Context) {
+    fun isRemoteEmpty(context: Context) :Boolean {
+        var result = false
         val configuration = SQLiteCloudConfig.fromString(connectionString)
         val sqLiteCloud = SQLiteCloud(appContext = context, config = configuration)
         CoroutineScope(Dispatchers.IO).launch {
@@ -79,7 +78,21 @@ class Sync() {
             val r =
                 sqLiteCloud.execute("SELECT CASE WHEN EXISTS(SELECT 1 FROM items) THEN 0 ELSE 1 END AS IsEmpty")
             Log.d("Select latest1", r.value.toString())
+            if (r.value !is SQLiteCloudRowset) {
+                Log.e("checkRemoteEmpty", "Result is not a SQLiteCloudRowset")
+            }
+            val rowset = r.value as SQLiteCloudRowset
+            if (rowset.rows.isEmpty()) {
+                Log.e("checkRemoteEmpty", "No rows found")
+            }
+            val row = rowset.rows[0]
+            result = when(convertSqliteCloudValue<Int>(row[0], "IsEmpty")){
+                0 -> false
+                else -> true
+            }
+            Log.d("Remote empty", result.toString())
         }
+        return result
     }
     private fun convertToItemList(result: SQLiteCloudResult): List<Item> {
         if (result.value !is SQLiteCloudRowset) {

@@ -19,6 +19,7 @@ class SyncWorker(appContext: Context, workerParams: WorkerParameters) :
             if (connectionString != null) {
                 sync.setConnection(connectionString)
                 sync.selectLatest(applicationContext)
+                sync.isRemoteEmpty(applicationContext)
             }
             if (username != null) {
                 //do something with username

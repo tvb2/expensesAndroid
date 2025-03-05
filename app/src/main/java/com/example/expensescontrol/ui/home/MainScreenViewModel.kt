@@ -89,14 +89,7 @@ class MainScreenViewModel(
     val mainUiState: StateFlow<MainUiState> = _mainUiState.asStateFlow()
     val isLocalDBEmpty: Boolean = false
 
-    fun synchronize(){
-        if (account.username != "user1" || account.connectionString != "default") {
 
-            sync.setConnection(account.connectionString)
-            sync.selectLatest(cont)
-            sync.synchronize(isLocalDBEmpty, cont)
-        }
-    }
     fun populateRegularCategories(){
         categoriesList = jsonhandler.data.categories
     }
