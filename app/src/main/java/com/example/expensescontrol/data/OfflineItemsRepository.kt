@@ -48,4 +48,6 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository{
 
     override suspend fun currentPeriodIncome(date: String): Double = itemDao.currentPeriodIncome(date)
 
+    override suspend fun isLocalEmpty(): Boolean = itemDao.isLocalEmpty()
+
 }

@@ -59,7 +59,8 @@ object AppViewModelProvider {
             MainScreenViewModel(
                 expensesApplication().container.itemsRepository,
                 expensesApplication().container.sync,
-                expensesApplication().container.jsonhandler)
+                expensesApplication().container.jsonhandler,
+                expensesApplication())
         }
     }
 }

@@ -85,6 +85,8 @@ fun MainScreen(
     //ViewModels for Main screen and for Statistics
     val mainUiState by viewModel.mainScreenRepoUiState.collectAsState()
     val scrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
+    val context = LocalContext.current
+    viewModel.scheduleSync()
 
     Scaffold (
         bottomBar = { AppBottomBar(

@@ -24,6 +24,12 @@ roomKtx = "2.6.1"
 junitJunit = "4.12"
 protoliteWellKnownTypes = "18.0.0"
 monitor = "1.6.1"
+runner = "1.5.2"
+workRuntimeKtx = "2.10.0"
+core = "1.13.0"
+coreVersion = "1.12.0"
+espressoCoreVersion = "3.5.1"
+material = "1.10.0"
 
 [libraries]
 androidx-compose-bom-v20241201 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
@@ -61,6 +67,12 @@ ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
 protolite-well-known-types = { group = "com.google.firebase", name = "protolite-well-known-types", version.ref = "protoliteWellKnownTypes" }
 androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
+androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
+androidx-core = { group = "androidx.core", name = "core", version.ref = "core" }
+core = { group = "androidx.core", name = "core", version.ref = "coreVersion" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCoreVersion" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

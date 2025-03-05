@@ -57,4 +57,7 @@ interface ItemDao {
             "category = 'Income' ")
     suspend fun currentPeriodIncome(date: String): Double
 
+    @Query("SELECT CASE WHEN EXISTS(SELECT 1 FROM items) THEN 0 ELSE 1 END AS IsEmpty")
+    suspend fun isLocalEmpty(): Boolean
+
 }

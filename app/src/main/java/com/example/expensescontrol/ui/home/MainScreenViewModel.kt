@@ -16,6 +16,7 @@
 
 package com.example.expensescontrol.ui.home
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -34,20 +35,29 @@ import com.example.expensescontrol.ui.sync.Sync
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import network.chaintech.kmp_date_time_picker.utils.now
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
-
+import androidx.work.PeriodicWorkRequestBuilder
+import java.util.concurrent.TimeUnit
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
+import com.example.expensescontrol.workers.SyncWorker
+import androidx.work.Data
 
 /**
  * ViewModel to retrieve all items in the Room database.
  */
 class MainScreenViewModel(
     private val itemsRepository: ItemsRepository,
-    val sync: Sync,
-    jSonHandler: JSonHandler
+    private val sync: Sync,
+    private val jsonhandler: JSonHandler,
+    private val cont: Context
 ): ViewModel() {
 
      private val isAscending: Boolean = false // Change this as needed
@@ -75,10 +85,18 @@ class MainScreenViewModel(
         private set
     var account by mutableStateOf(Account("", ""))
         private set
-    private val jsonhandler = jSonHandler
     private val _mainUiState = MutableStateFlow(MainUiState())
     val mainUiState: StateFlow<MainUiState> = _mainUiState.asStateFlow()
+    val isLocalDBEmpty: Boolean = false
 
+    fun synchronize(){
+        if (account.username != "user1" || account.connectionString != "default") {
+
+            sync.setConnection(account.connectionString)
+            sync.selectLatest(cont)
+            sync.synchronize(isLocalDBEmpty, cont)
+        }
+    }
     fun populateRegularCategories(){
         categoriesList = jsonhandler.data.categories
     }
@@ -193,6 +211,40 @@ class MainScreenViewModel(
     fun isAccountSetUp(): Boolean{
         return (jsonhandler.data.account.username != "user1" &&
                 jsonhandler.data.account.connectionString != "default")
+    }
+    suspend fun localDBEmpty(): Boolean {
+        return itemsRepository.isLocalEmpty()
+    }
+    fun scheduleSync() {
+        viewModelScope.launch {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            val inputData = createInputData()
+
+            val syncWorkRequest = PeriodicWorkRequestBuilder<SyncWorker>(
+                5, // repeatInterval
+                TimeUnit.MINUTES
+            )
+                .setConstraints(constraints)
+                .setInputData(inputData)
+                .build()
+            WorkManager.getInstance(cont).enqueue(syncWorkRequest)
+        }
+    }
+
+    private fun createInputData(): androidx.work.Data {
+        var connection = "default"
+        var username = "user1"
+        if (mainUiState != null) {
+            connection = mainUiState.value.connectionString
+            username = mainUiState.value.userName
+        }
+        return Data.Builder()
+            .putString("connectionString", connection)
+            .putString("username", username)
+            .build()
     }
 
     /**
