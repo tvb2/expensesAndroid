@@ -44,7 +44,6 @@ import com.example.expensescontrol.AllExpenses
 import com.example.expensescontrol.R
 import com.example.expensescontrol.data.Item
 import com.example.expensescontrol.ui.AppBottomBar
-import com.example.expensescontrol.ui.AppViewModelProvider
 import com.example.expensescontrol.ui.navigation.NavigationDestination
 import com.example.expensescontrol.ui.stats.StatisticsViewModel
 import com.example.expensescontrol.ui.sync.Sync
@@ -54,6 +53,7 @@ import network.chaintech.kmp_date_time_picker.ui.datepicker.WheelDatePickerView
 import network.chaintech.kmp_date_time_picker.utils.DateTimePickerView
 import network.chaintech.kmp_date_time_picker.utils.now
 import java.time.LocalDate
+import androidx.hilt.navigation.compose.hiltViewModel
 
 
 object MainScreenDestination : NavigationDestination {
@@ -69,8 +69,8 @@ fun MainScreen(
     navigateToAllExpsScreen: () -> Unit,
     navigateAddNonRegular: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MainScreenViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    statistics: StatisticsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: MainScreenViewModel = hiltViewModel(),
+    statistics: StatisticsViewModel = hiltViewModel()
 )
 {
     //Read config data from JSON file

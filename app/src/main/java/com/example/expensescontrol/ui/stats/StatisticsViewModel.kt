@@ -32,6 +32,7 @@ import com.example.expensescontrol.data.ItemsRepository
 import com.example.expensescontrol.model.StatisticsUiState
 import com.example.expensescontrol.ui.allexp.AllExpensesUiState
 import com.example.expensescontrol.ui.home.JSonHandler
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -50,9 +51,10 @@ import network.chaintech.kmp_date_time_picker.utils.now
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import kotlinx.datetime.*
+import javax.inject.Inject
 
-
-class StatisticsViewModel(
+@HiltViewModel
+class StatisticsViewModel  @Inject constructor(
     private val itemsRepository: ItemsRepository,
     jsonhandler: JSonHandler): ViewModel() {
 

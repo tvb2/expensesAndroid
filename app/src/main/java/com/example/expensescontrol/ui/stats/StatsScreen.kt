@@ -51,12 +51,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.expensescontrol.ui.theme.ExpensesControlTheme
 import com.example.expensescontrol.R
 import com.example.expensescontrol.model.StatisticsUiState
 import com.example.expensescontrol.ui.AppBottomBar
-import com.example.expensescontrol.ui.AppViewModelProvider
 import com.example.expensescontrol.ui.home.AddNewCategoryDialog
 import com.example.expensescontrol.ui.home.JSonHandler
 import com.example.expensescontrol.ui.home.MainScreenDestination
@@ -79,7 +79,7 @@ fun StatsScreen(
     navigateToMainScreen: () -> Unit,
     navigateToSettingsScreen: () -> Unit,
     navigateToAllExpsScreen: () -> Unit,
-    statistics: StatisticsViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    statistics: StatisticsViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 )
 {

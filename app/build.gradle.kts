@@ -79,7 +79,8 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.hilt.android.v2511)
     kapt(libs.hilt.compiler)
-    }
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+}
 kapt {
     correctErrorTypes = true
 }

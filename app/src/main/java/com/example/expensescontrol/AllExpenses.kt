@@ -32,9 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.expensescontrol.data.Item
-import com.example.expensescontrol.ui.AppViewModelProvider
 import com.example.expensescontrol.ui.allexp.AllExpensesViewModel
 import com.example.expensescontrol.ui.home.MainScreenViewModel
 import com.example.expensescontrol.ui.stats.StatisticsViewModel
@@ -124,8 +124,8 @@ fun ExpenseRecordView(
  fun PreviousExpensesCard(
      itemClicked: () -> Unit,
      record: Item,
-     viewModel: AllExpensesViewModel = viewModel(factory = AppViewModelProvider.Factory),
-     stats: StatisticsViewModel = viewModel(factory = AppViewModelProvider.Factory),
+     viewModel: AllExpensesViewModel = hiltViewModel(),
+     stats: StatisticsViewModel = hiltViewModel(),
      modifier: Modifier = Modifier){
      val createdDate = record.dateCreated.parseToLocalDate()
      val customFormat = LocalDate.Format {
