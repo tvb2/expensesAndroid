@@ -22,14 +22,17 @@ import kotlinx.coroutines.flow.StateFlow
 
 import com.example.expensescontrol.data.Item
 import com.example.expensescontrol.data.ItemsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
 /**
  * ViewModel to retrieve all items in the Room database.
  */
-class AllExpensesViewModel(private val itemsRepository: ItemsRepository): ViewModel() {
+@HiltViewModel
+class AllExpensesViewModel  @Inject constructor(private val itemsRepository: ItemsRepository): ViewModel() {
     /**
      * Holds home ui state. The list of items are retrieved from [ItemsRepository] and mapped to
      * [HomeUiState]

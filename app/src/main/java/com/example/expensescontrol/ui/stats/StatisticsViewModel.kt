@@ -56,7 +56,7 @@ import javax.inject.Inject
 @HiltViewModel
 class StatisticsViewModel  @Inject constructor(
     private val itemsRepository: ItemsRepository,
-    jsonhandler: JSonHandler): ViewModel() {
+    private val jsonhandler: JSonHandler): ViewModel() {
 
         init{
             runBlocking {
@@ -71,7 +71,6 @@ class StatisticsViewModel  @Inject constructor(
     private var startDateLD: LocalDate = LocalDate.now()
     private var startOfPeriod: String = LocalDate.now().toString()
     private var months: Double = 1.0
-    private val jsonhandler = jsonhandler
 
     private val _statsUiState = MutableStateFlow(StatisticsUiState())
     val statsUiState: StateFlow<StatisticsUiState> = _statsUiState.asStateFlow()
@@ -294,7 +293,7 @@ class StatisticsViewModel  @Inject constructor(
 
 //General functions
     fun populateRegularCategories(){
-        categoriesList = this.jsonhandler.data.categories
+        categoriesList = jsonhandler.data.categories
     }
     fun updateSelectedCat(newCat: String){
         categorySelected = newCat

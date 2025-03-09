@@ -4,7 +4,7 @@ plugins {
     id("com.google.devtools.ksp") version "2.1.0-1.0.29"
     id("org.jetbrains.kotlin.plugin.compose")
     id ("org.jetbrains.kotlin.plugin.serialization")
-    id("com.google.dagger.hilt.android") version "2.51"
+    id("com.google.dagger.hilt.android") version "2.55"
     id("kotlin-kapt")
 }
 
@@ -72,14 +72,15 @@ dependencies {
     implementation(libs.espresso.core)
     implementation(libs.material)
     implementation(libs.androidx.core)
+    implementation(libs.androidx.hilt.work)
     testImplementation(libs.junit.junit)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.serialization.json)
     androidTestImplementation(libs.androidx.monitor)
     ksp(libs.androidx.room.compiler)
-    implementation(libs.hilt.android.v2511)
-    kapt(libs.hilt.compiler)
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler.v255)
+    implementation(libs.androidx.hilt.navigation.compose.v120)
 }
 kapt {
     correctErrorTypes = true

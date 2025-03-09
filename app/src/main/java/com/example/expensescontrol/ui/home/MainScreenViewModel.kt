@@ -22,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
 import com.example.expensescontrol.data.Account
 import com.example.expensescontrol.model.MainUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +42,13 @@ import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import androidx.work.Data
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.expensescontrol.workers.SyncWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -202,24 +209,24 @@ class MainScreenViewModel  @Inject constructor(
     suspend fun localDBEmpty(): Boolean {
         return itemsRepository.isLocalEmpty()
     }
-//    fun scheduleSync() {
-//        viewModelScope.launch {
-//            val constraints = Constraints.Builder()
-//                .setRequiredNetworkType(NetworkType.CONNECTED)
-//                .build()
-//
-//            val inputData = createInputData()
-//
-//            val syncWorkRequest = PeriodicWorkRequestBuilder<SyncWorker>(
-//                5, // repeatInterval
-//                TimeUnit.MINUTES
-//            )
-//                .setConstraints(constraints)
-//                .setInputData(inputData)
-//                .build()
-//            WorkManager.getInstance(cont).enqueue(syncWorkRequest)
-//        }
-//    }
+    fun scheduleSync() {
+        viewModelScope.launch {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            val inputData = createInputData()
+
+            val syncWorkRequest = PeriodicWorkRequestBuilder<SyncWorker>(
+                5, // repeatInterval
+                TimeUnit.MINUTES
+            )
+                .setConstraints(constraints)
+                .setInputData(inputData)
+                .build()
+            WorkManager.getInstance().enqueue(syncWorkRequest)
+        }
+    }
 
     private fun createInputData(): androidx.work.Data {
         var connection = "default"

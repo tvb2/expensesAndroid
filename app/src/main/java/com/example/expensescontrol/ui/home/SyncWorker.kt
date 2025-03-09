@@ -2,14 +2,31 @@ package com.example.expensescontrol.workers
 
 import android.content.Context
 import android.util.Log
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.expensescontrol.data.ItemsRepository
 import com.example.expensescontrol.ui.sync.Sync
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 
-class SyncWorker(appContext: Context, workerParams: WorkerParameters) :
-    CoroutineWorker(appContext, workerParams) {
+@HiltWorker
+class SyncWorker @AssistedInject constructor(
+    @Assisted private val context: Context,
+    @Assisted private val workerParams: WorkerParameters,
+    private val itemsRepository: ItemsRepository,
+    private val sync: Sync) :
+    CoroutineWorker(context, workerParams) {
 
-    private val sync = Sync()
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            @Assisted context: Context,
+            @Assisted workerParameters: WorkerParameters
+        ): SyncWorker
+    }
+
     private val  connectionString = workerParams.inputData.getString("connectionString")
     private val username = workerParams.inputData.getString("username")
     override suspend fun doWork(): Result {
