@@ -3,23 +3,19 @@ package com.example.expensescontrol.di
 import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.WorkManager
-import androidx.work.WorkerParameters
 import com.example.expensescontrol.data.ExpensesDatabase
 import com.example.expensescontrol.data.ItemDao
 import com.example.expensescontrol.data.ItemsRepository
 import com.example.expensescontrol.data.OfflineItemsRepository
 import com.example.expensescontrol.ui.home.JSonHandler
-import com.example.expensescontrol.ui.home.WorkerKey
 import com.example.expensescontrol.ui.sync.Sync
-import com.example.expensescontrol.workers.SyncWorker
+import com.example.expensescontrol.ui.sync.SyncWorker
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import dagger.assisted.AssistedFactory
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.IntoMap
 import javax.inject.Singleton
 
 @Module

@@ -1,4 +1,4 @@
-package com.example.expensescontrol.ui.home
+package com.example.expensescontrol.hilt
 
 import androidx.work.ListenableWorker
 import dagger.MapKey

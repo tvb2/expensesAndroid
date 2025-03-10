@@ -16,7 +16,6 @@
 
 package com.example.expensescontrol.ui.home
 
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -43,11 +42,10 @@ import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.example.expensescontrol.workers.SyncWorker
+import com.example.expensescontrol.ui.sync.SyncWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -63,9 +61,7 @@ class MainScreenViewModel  @Inject constructor(
     private val jsonhandler: JSonHandler,
     private val workManager: WorkManager
 ): ViewModel() {
-init {
-    scheduleSync()
-}
+
      private val isAscending: Boolean = false // Change this as needed
 
     val mainScreenRepoUiState: StateFlow<AllExpensesUiState> =

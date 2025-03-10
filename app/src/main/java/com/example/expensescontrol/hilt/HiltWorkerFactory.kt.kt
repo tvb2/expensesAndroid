@@ -1,10 +1,10 @@
-package com.example.expensescontrol.ui.home
+package com.example.expensescontrol.hilt
 
 import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import com.example.expensescontrol.workers.SyncWorker
+import com.example.expensescontrol.ui.sync.SyncWorker
 import javax.inject.Inject
 
 class ExpensesHiltWorkerFactory @Inject constructor(

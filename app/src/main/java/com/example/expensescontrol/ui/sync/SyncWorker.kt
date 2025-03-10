@@ -1,4 +1,4 @@
-package com.example.expensescontrol.workers
+package com.example.expensescontrol.ui.sync
 
 import android.content.Context
 import android.util.Log
@@ -6,7 +6,6 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.expensescontrol.data.ItemsRepository
-import com.example.expensescontrol.ui.sync.Sync
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
