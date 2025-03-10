@@ -16,12 +16,10 @@ import java.time.format.DateTimeParseException
 import kotlin.text.toBoolean
 
 class Sync private constructor(private val itemsRepository: ItemsRepository) {
-    // ... your Sync class code ...
 
     companion object {
         @Volatile
         private var INSTANCE: Sync? = null
-
         fun getInstance(itemsRepository: ItemsRepository): Sync {
             return INSTANCE ?: synchronized(this) {
                 val instance = Sync(itemsRepository)

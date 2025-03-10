@@ -80,6 +80,7 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler.v255)
+    kapt (libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose.v120)
 }
 kapt {

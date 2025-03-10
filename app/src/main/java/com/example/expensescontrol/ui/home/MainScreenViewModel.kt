@@ -42,6 +42,8 @@ import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import androidx.work.Data
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -59,8 +61,11 @@ class MainScreenViewModel  @Inject constructor(
     private val itemsRepository: ItemsRepository,
     private val sync: Sync,
     private val jsonhandler: JSonHandler,
+    private val workManager: WorkManager
 ): ViewModel() {
-
+init {
+    scheduleSync()
+}
      private val isAscending: Boolean = false // Change this as needed
 
     val mainScreenRepoUiState: StateFlow<AllExpensesUiState> =
@@ -217,14 +222,19 @@ class MainScreenViewModel  @Inject constructor(
 
             val inputData = createInputData()
 
-            val syncWorkRequest = PeriodicWorkRequestBuilder<SyncWorker>(
+            val syncWorkRequest =
+                PeriodicWorkRequestBuilder<SyncWorker>(
                 5, // repeatInterval
                 TimeUnit.MINUTES
             )
                 .setConstraints(constraints)
                 .setInputData(inputData)
                 .build()
-            WorkManager.getInstance().enqueue(syncWorkRequest)
+            workManager.enqueueUniquePeriodicWork(
+                "SyncWorker", // A unique name for this work
+                ExistingPeriodicWorkPolicy.KEEP, // How to handle duplicate requests
+                syncWorkRequest
+            )
         }
     }
 
